@@ -72,6 +72,7 @@ class RegistroWizard extends Component
     {
         return view('livewire.registro-wizard', [
             'catalogos' => $this->catalogos(),
+            'requiredFields' => $this->requiredFields(),
         ]);
     }
 
@@ -98,6 +99,16 @@ class RegistroWizard extends Component
     {
         return collect(RegistroAlumnoRules::rules())
             ->mapWithKeys(fn (array $rules, string $field) => ['form.'.$field => $rules])
+            ->all();
+    }
+
+    private function requiredFields(): array
+    {
+        return collect(RegistroAlumnoRules::rules())
+            ->filter(fn (array $rules) => collect($rules)->contains(
+                fn (mixed $rule) => is_string($rule) && in_array($rule, ['required', 'accepted'], true)
+            ))
+            ->keys()
             ->all();
     }
 

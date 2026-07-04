@@ -1,76 +1,151 @@
 @php
-    $input = 'mt-1 w-full rounded border-gray-300 text-sm';
+    $input = 'mt-1 min-h-11 w-full rounded border-gray-300 text-sm';
     $select = $input;
+    $isRequired = fn (string $field) => in_array($field, $requiredFields, true);
+    $id = fn (string $field) => 'form_'.$field;
+    $describedBy = fn (string $field) => $errors->has('form.'.$field) ? $id($field).'_error' : null;
 @endphp
 
 <form wire:submit="submit" class="mt-4 space-y-5">
-    <div class="flex items-center justify-between rounded bg-white p-3 text-sm shadow-sm">
-        <span>Paso {{ $step }} de 6</span>
-        <span class="font-semibold text-cobaem-900">
-            {{ ['CURP y folio', 'Datos personales', 'Contacto', 'Escuela', 'Familia', 'Privacidad'][$step - 1] }}
-        </span>
+    <div class="rounded bg-white p-3 text-sm shadow-sm">
+        <div class="flex items-center justify-between">
+            <span>Paso {{ $step }} de 6</span>
+            <span class="font-semibold text-cobaem-900">
+                {{ ['CURP y folio', 'Datos personales', 'Contacto', 'Escuela', 'Familia', 'Privacidad'][$step - 1] }}
+            </span>
+        </div>
+        <div class="mt-3 h-2 rounded bg-gray-100">
+            <div class="h-2 rounded bg-cobaem-900" style="width: {{ (int) (($step / 6) * 100) }}%"></div>
+        </div>
     </div>
 
+    <x-leyenda-obligatorios />
+
     @if ($step === 1)
-        <section class="rounded bg-white p-4 shadow-sm">
-            <label class="block text-sm">CURP<input wire:model="form.curp" maxlength="18" required class="{{ $input }} uppercase"></label>
-            <label class="mt-3 block text-sm">Folio de examen<input wire:model="form.folio_examen" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Confirmar folio de examen<input wire:model="form.folio_examen_confirmacion" required class="{{ $input }}"></label>
-            <input type="hidden" wire:model="form.semestre_solicitado">
+        <section class="space-y-4 rounded bg-white p-4 shadow-sm">
+            <x-campo for="{{ $id('curp') }}" label="CURP" :required="$isRequired('curp')" help="Escribe los 18 caracteres de tu CURP en mayusculas.">
+                <input id="{{ $id('curp') }}" name="curp" wire:model="form.curp" maxlength="18" autocomplete="section-curp one-time-code" autocapitalize="characters" autocorrect="off" aria-required="{{ $isRequired('curp') ? 'true' : 'false' }}" @if($describedBy('curp')) aria-describedby="{{ $describedBy('curp') }}" @endif required class="{{ $input }} uppercase">
+            </x-campo>
+            <x-campo for="{{ $id('folio_examen') }}" label="Folio de examen" :required="$isRequired('folio_examen')" help="Lo encuentras en la hoja de respuestas o comprobante entregado al terminar tu examen.">
+                <input id="{{ $id('folio_examen') }}" name="folio_examen" wire:model="form.folio_examen" autocomplete="section-folio one-time-code" aria-required="{{ $isRequired('folio_examen') ? 'true' : 'false' }}" @if($describedBy('folio_examen')) aria-describedby="{{ $describedBy('folio_examen') }}" @endif required class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('folio_examen_confirmacion') }}" label="Confirmar folio de examen" :required="$isRequired('folio_examen_confirmacion')">
+                <input id="{{ $id('folio_examen_confirmacion') }}" name="folio_examen_confirmacion" wire:model="form.folio_examen_confirmacion" autocomplete="section-folio-confirmacion one-time-code" aria-required="{{ $isRequired('folio_examen_confirmacion') ? 'true' : 'false' }}" @if($describedBy('folio_examen_confirmacion')) aria-describedby="{{ $describedBy('folio_examen_confirmacion') }}" @endif required class="{{ $input }}">
+            </x-campo>
+            <input type="hidden" name="semestre_solicitado" wire:model="form.semestre_solicitado">
         </section>
     @elseif ($step === 2)
-        <section class="rounded bg-white p-4 shadow-sm">
-            <label class="block text-sm">Nombre(s)<input wire:model="form.nombres" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Primer apellido<input wire:model="form.primer_apellido" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Segundo apellido<input wire:model="form.segundo_apellido" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Fecha de nacimiento<input type="date" wire:model="form.fecha_nacimiento" required class="{{ $input }}"></label>
+        <section class="space-y-4 rounded bg-white p-4 shadow-sm">
+            <x-campo for="{{ $id('nombres') }}" label="Nombre(s)" :required="$isRequired('nombres')">
+                <input id="{{ $id('nombres') }}" name="nombres" autocomplete="section-alumno given-name" wire:model="form.nombres" aria-required="{{ $isRequired('nombres') ? 'true' : 'false' }}" required class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('primer_apellido') }}" label="Primer apellido" :required="$isRequired('primer_apellido')">
+                <input id="{{ $id('primer_apellido') }}" name="primer_apellido" autocomplete="section-alumno family-name" wire:model="form.primer_apellido" aria-required="{{ $isRequired('primer_apellido') ? 'true' : 'false' }}" required class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('segundo_apellido') }}" label="Segundo apellido" :required="$isRequired('segundo_apellido')">
+                <input id="{{ $id('segundo_apellido') }}" name="segundo_apellido" autocomplete="section-alumno additional-name" wire:model="form.segundo_apellido" aria-required="{{ $isRequired('segundo_apellido') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('fecha_nacimiento') }}" label="Fecha de nacimiento" :required="$isRequired('fecha_nacimiento')">
+                <input id="{{ $id('fecha_nacimiento') }}" type="date" name="fecha_nacimiento" autocomplete="section-alumno bday" wire:model="form.fecha_nacimiento" aria-required="{{ $isRequired('fecha_nacimiento') ? 'true' : 'false' }}" required class="{{ $input }}">
+            </x-campo>
             @foreach (['sexo' => 'Sexo', 'nacionalidad' => 'Nacionalidad', 'estado_civil' => 'Estado civil', 'entidad' => 'Entidad de nacimiento', 'municipio' => 'Municipio de nacimiento', 'tipo_estudiante' => 'Tipo de estudiante'] as $tipo => $label)
-                <label class="mt-3 block text-sm">{{ $label }}
-                    <select wire:model="form.{{ $tipo === 'entidad' ? 'entidad_nacimiento_id' : ($tipo === 'municipio' ? 'municipio_nacimiento_id' : $tipo.'_id') }}" required class="{{ $select }}">
+                @php $field = $tipo === 'entidad' ? 'entidad_nacimiento_id' : ($tipo === 'municipio' ? 'municipio_nacimiento_id' : $tipo.'_id'); @endphp
+                <x-campo for="{{ $id($field) }}" :label="$label" :required="$isRequired($field)">
+                    <select id="{{ $id($field) }}" name="{{ $field }}" wire:model="form.{{ $field }}" aria-required="{{ $isRequired($field) ? 'true' : 'false' }}" required class="{{ $select }}">
                         <option value="">Selecciona</option>
                         @foreach ($catalogos[$tipo] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach
                     </select>
-                </label>
+                </x-campo>
             @endforeach
-            <label class="mt-3 block text-sm">Paraescolar<select wire:model="form.paraescolar_id" class="{{ $select }}"><option value="">Sin seleccionar</option>@foreach ($catalogos['paraescolar'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
+            <x-campo for="{{ $id('paraescolar_id') }}" label="Paraescolar" :required="$isRequired('paraescolar_id')">
+                <select id="{{ $id('paraescolar_id') }}" name="paraescolar_id" wire:model="form.paraescolar_id" aria-required="{{ $isRequired('paraescolar_id') ? 'true' : 'false' }}" class="{{ $select }}">
+                    <option value="">Sin seleccionar</option>
+                    @foreach ($catalogos['paraescolar'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach
+                </select>
+            </x-campo>
         </section>
     @elseif ($step === 3)
-        <section class="rounded bg-white p-4 shadow-sm">
-            <label class="block text-sm">Municipio<select wire:model="form.municipio_id" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
-            <label class="mt-3 block text-sm">Localidad<select wire:model="form.localidad_id" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['localidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
-            <label class="mt-3 block text-sm">Domicilio<input wire:model="form.domicilio" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Colonia<input wire:model="form.colonia" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Codigo postal<input wire:model="form.codigo_postal" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Telefono<input wire:model="form.telefono" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Celular<input wire:model="form.celular" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Correo<input type="email" wire:model="form.correo" class="{{ $input }}"></label>
+        <section class="space-y-4 rounded bg-white p-4 shadow-sm">
+            <x-campo for="{{ $id('municipio_id') }}" label="Municipio" :required="$isRequired('municipio_id')">
+                <select id="{{ $id('municipio_id') }}" name="municipio_id" wire:model="form.municipio_id" aria-required="{{ $isRequired('municipio_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+            </x-campo>
+            <x-campo for="{{ $id('localidad_id') }}" label="Localidad" :required="$isRequired('localidad_id')">
+                <select id="{{ $id('localidad_id') }}" name="localidad_id" wire:model="form.localidad_id" aria-required="{{ $isRequired('localidad_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['localidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+            </x-campo>
+            <x-campo for="{{ $id('domicilio') }}" label="Domicilio" :required="$isRequired('domicilio')">
+                <input id="{{ $id('domicilio') }}" name="domicilio" autocomplete="section-alumno street-address" wire:model="form.domicilio" aria-required="{{ $isRequired('domicilio') ? 'true' : 'false' }}" required class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('colonia') }}" label="Colonia" :required="$isRequired('colonia')">
+                <input id="{{ $id('colonia') }}" name="colonia" wire:model="form.colonia" aria-required="{{ $isRequired('colonia') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('codigo_postal') }}" label="Codigo postal" :required="$isRequired('codigo_postal')">
+                <input id="{{ $id('codigo_postal') }}" name="codigo_postal" autocomplete="section-alumno postal-code" wire:model="form.codigo_postal" aria-required="{{ $isRequired('codigo_postal') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('telefono') }}" label="Telefono" :required="$isRequired('telefono')">
+                <input id="{{ $id('telefono') }}" name="telefono" type="tel" inputmode="numeric" autocomplete="section-alumno tel" wire:model="form.telefono" aria-required="{{ $isRequired('telefono') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('celular') }}" label="Celular" :required="$isRequired('celular')">
+                <input id="{{ $id('celular') }}" name="celular" type="tel" inputmode="numeric" autocomplete="section-alumno tel" wire:model="form.celular" aria-required="{{ $isRequired('celular') ? 'true' : 'false' }}" required class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('correo') }}" label="Correo" :required="$isRequired('correo')">
+                <input id="{{ $id('correo') }}" type="email" name="correo" autocomplete="section-alumno email" wire:model="form.correo" aria-required="{{ $isRequired('correo') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
         </section>
     @elseif ($step === 4)
-        <section class="rounded bg-white p-4 shadow-sm">
-            <label class="block text-sm">Entidad<select wire:model="form.entidad_secundaria_id" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['entidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
-            <label class="mt-3 block text-sm">Municipio<select wire:model="form.municipio_secundaria_id" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
-            <label class="mt-3 block text-sm">Nombre de la escuela<input wire:model="form.secundaria_nombre" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Tipo de secundaria<select wire:model="form.tipo_secundaria_id" class="{{ $select }}"><option value="">Sin seleccionar</option>@foreach ($catalogos['tipo_secundaria'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
-            <label class="mt-3 block text-sm">Turno<select wire:model="form.turno_secundaria_id" class="{{ $select }}"><option value="">Sin seleccionar</option>@foreach ($catalogos['turno'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
-            <label class="mt-3 block text-sm">Promedio<input type="number" step="0.01" min="0" max="10" wire:model="form.promedio_secundaria" required class="{{ $input }}"></label>
+        <section class="space-y-4 rounded bg-white p-4 shadow-sm">
+            <x-campo for="{{ $id('entidad_secundaria_id') }}" label="Entidad" :required="$isRequired('entidad_secundaria_id')">
+                <select id="{{ $id('entidad_secundaria_id') }}" name="entidad_secundaria_id" wire:model="form.entidad_secundaria_id" aria-required="{{ $isRequired('entidad_secundaria_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['entidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+            </x-campo>
+            <x-campo for="{{ $id('municipio_secundaria_id') }}" label="Municipio" :required="$isRequired('municipio_secundaria_id')">
+                <select id="{{ $id('municipio_secundaria_id') }}" name="municipio_secundaria_id" wire:model="form.municipio_secundaria_id" aria-required="{{ $isRequired('municipio_secundaria_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+            </x-campo>
+            <x-campo for="{{ $id('secundaria_nombre') }}" label="Nombre de la escuela" :required="$isRequired('secundaria_nombre')">
+                <input id="{{ $id('secundaria_nombre') }}" name="secundaria_nombre" wire:model="form.secundaria_nombre" aria-required="{{ $isRequired('secundaria_nombre') ? 'true' : 'false' }}" required class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('tipo_secundaria_id') }}" label="Tipo de secundaria" :required="$isRequired('tipo_secundaria_id')">
+                <select id="{{ $id('tipo_secundaria_id') }}" name="tipo_secundaria_id" wire:model="form.tipo_secundaria_id" aria-required="{{ $isRequired('tipo_secundaria_id') ? 'true' : 'false' }}" class="{{ $select }}"><option value="">Sin seleccionar</option>@foreach ($catalogos['tipo_secundaria'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+            </x-campo>
+            <x-campo for="{{ $id('turno_secundaria_id') }}" label="Turno" :required="$isRequired('turno_secundaria_id')">
+                <select id="{{ $id('turno_secundaria_id') }}" name="turno_secundaria_id" wire:model="form.turno_secundaria_id" aria-required="{{ $isRequired('turno_secundaria_id') ? 'true' : 'false' }}" class="{{ $select }}"><option value="">Sin seleccionar</option>@foreach ($catalogos['turno'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+            </x-campo>
+            <x-campo for="{{ $id('promedio_secundaria') }}" label="Promedio" :required="$isRequired('promedio_secundaria')">
+                <input id="{{ $id('promedio_secundaria') }}" type="number" name="promedio_secundaria" step="0.01" min="0" max="10" inputmode="decimal" wire:model="form.promedio_secundaria" aria-required="{{ $isRequired('promedio_secundaria') ? 'true' : 'false' }}" required class="{{ $input }}">
+            </x-campo>
         </section>
     @elseif ($step === 5)
-        <section class="rounded bg-white p-4 shadow-sm">
-            <label class="block text-sm">Nombre(s) tutor<input wire:model="form.tutor_nombres" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Primer apellido tutor<input wire:model="form.tutor_primer_apellido" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Segundo apellido tutor<input wire:model="form.tutor_segundo_apellido" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Celular tutor<input wire:model="form.tutor_celular" required class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Telefono tutor<input wire:model="form.tutor_telefono" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Nombre(s) madre<input wire:model="form.madre_nombres" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Primer apellido madre<input wire:model="form.madre_primer_apellido" class="{{ $input }}"></label>
+        <section class="space-y-4 rounded bg-white p-4 shadow-sm">
+            @foreach ([
+                'tutor_nombres' => 'Nombre(s) tutor',
+                'tutor_primer_apellido' => 'Primer apellido tutor',
+                'tutor_segundo_apellido' => 'Segundo apellido tutor',
+                'tutor_celular' => 'Celular tutor',
+                'tutor_telefono' => 'Telefono tutor',
+                'madre_nombres' => 'Nombre(s) madre',
+                'madre_primer_apellido' => 'Primer apellido madre',
+            ] as $field => $label)
+                <x-campo for="{{ $id($field) }}" :label="$label" :required="$isRequired($field)">
+                    <input id="{{ $id($field) }}" name="{{ $field }}" @if(str_contains($field, 'telefono') || str_contains($field, 'celular')) type="tel" inputmode="numeric" autocomplete="tel" @endif wire:model="form.{{ $field }}" aria-required="{{ $isRequired($field) ? 'true' : 'false' }}" @if($isRequired($field)) required @endif class="{{ $input }}">
+                </x-campo>
+            @endforeach
         </section>
     @else
-        <section class="rounded bg-white p-4 shadow-sm">
-            <label class="block text-sm">No. de seguro medico<input wire:model="form.no_seguro_medico" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Estatura<input type="number" step="0.01" wire:model="form.estatura" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Peso<input type="number" step="0.01" wire:model="form.peso" class="{{ $input }}"></label>
-            <label class="mt-3 block text-sm">Tipo de sangre<select wire:model="form.tipo_sangre_id" class="{{ $select }}"><option value="">Sin seleccionar</option>@foreach ($catalogos['tipo_sangre'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select></label>
-            <label class="mt-4 flex items-start gap-2 text-sm"><input type="checkbox" wire:model="form.acepto_privacidad" value="1" required class="mt-1"> Acepto el aviso de privacidad.</label>
+        <section class="space-y-4 rounded bg-white p-4 shadow-sm">
+            <x-campo for="{{ $id('no_seguro_medico') }}" label="No. de seguro medico" :required="$isRequired('no_seguro_medico')">
+                <input id="{{ $id('no_seguro_medico') }}" name="no_seguro_medico" wire:model="form.no_seguro_medico" aria-required="{{ $isRequired('no_seguro_medico') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('estatura') }}" label="Estatura" :required="$isRequired('estatura')">
+                <input id="{{ $id('estatura') }}" type="number" name="estatura" step="0.01" inputmode="decimal" wire:model="form.estatura" aria-required="{{ $isRequired('estatura') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('peso') }}" label="Peso" :required="$isRequired('peso')">
+                <input id="{{ $id('peso') }}" type="number" name="peso" step="0.01" inputmode="decimal" wire:model="form.peso" aria-required="{{ $isRequired('peso') ? 'true' : 'false' }}" class="{{ $input }}">
+            </x-campo>
+            <x-campo for="{{ $id('tipo_sangre_id') }}" label="Tipo de sangre" :required="$isRequired('tipo_sangre_id')">
+                <select id="{{ $id('tipo_sangre_id') }}" name="tipo_sangre_id" wire:model="form.tipo_sangre_id" aria-required="{{ $isRequired('tipo_sangre_id') ? 'true' : 'false' }}" class="{{ $select }}"><option value="">Sin seleccionar</option>@foreach ($catalogos['tipo_sangre'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+            </x-campo>
+            <label class="mt-4 flex min-h-11 items-start gap-2 text-sm">
+                <input id="{{ $id('acepto_privacidad') }}" type="checkbox" name="acepto_privacidad" wire:model="form.acepto_privacidad" value="1" required aria-required="true" class="mt-1">
+                <span>Acepto el aviso de privacidad <x-obligatorio :required="$isRequired('acepto_privacidad')" /></span>
+            </label>
         </section>
     @endif
 
@@ -80,12 +155,12 @@
 
     <div class="flex gap-3">
         @if ($step > 1)
-            <button type="button" wire:click="previous" class="w-full rounded bg-gray-200 px-4 py-3 font-semibold">Anterior</button>
+            <button type="button" wire:click="previous" class="min-h-11 w-full rounded bg-gray-200 px-4 py-3 font-semibold">Anterior</button>
         @endif
         @if ($step < 6)
-            <button type="button" wire:click="next" class="w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white">Siguiente</button>
+            <button type="button" wire:click="next" class="min-h-11 w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white">Siguiente</button>
         @else
-            <button class="w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white">Finalizar registro</button>
+            <button class="min-h-11 w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white">Finalizar registro</button>
         @endif
     </div>
 </form>
