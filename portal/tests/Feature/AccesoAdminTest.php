@@ -43,6 +43,33 @@ class AccesoAdminTest extends TestCase
         $this->actingAs($user)->get('/admin')->assertForbidden();
     }
 
+    public function test_creacion_de_ciclos_requiere_permiso_de_administrar_usuarios(): void
+    {
+        $controlEscolar = User::factory()->create();
+        $controlEscolar->assignRole('control_escolar');
+
+        $this->actingAs($controlEscolar)
+            ->post(route('admin.ciclos.store'), [
+                'anio' => 2027,
+                'periodo_escolar' => '27-2',
+                'generacion' => 'Nuevo ingreso 2027',
+            ])
+            ->assertForbidden();
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)
+            ->post(route('admin.ciclos.store'), [
+                'anio' => 2027,
+                'periodo_escolar' => '27-2',
+                'generacion' => 'Nuevo ingreso 2027',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('ciclos_ingreso', ['anio' => 2027]);
+    }
+
     public function test_usuario_inactivo_no_puede_iniciar_sesion(): void
     {
         $user = User::factory()->inactivo()->create([

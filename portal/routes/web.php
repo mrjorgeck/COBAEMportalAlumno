@@ -99,7 +99,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('sicobaem', [SicobaemConfigController::class, 'store'])->middleware('permission:modulos.publicar')->name('sicobaem.store');
         Route::get('catalogos', [CatalogoController::class, 'index'])->middleware('permission:catalogos.administrar')->name('catalogos.index');
         Route::post('catalogos', [CatalogoController::class, 'store'])->middleware('permission:catalogos.administrar')->name('catalogos.store');
-        Route::post('ciclos', [CicloController::class, 'store'])->middleware('permission:modulos.publicar')->name('ciclos.store');
+        Route::post('ciclos', [CicloController::class, 'store'])->middleware('permission:usuarios.administrar')->name('ciclos.store');
         Route::get('modulos', [ModuloController::class, 'index'])->middleware('permission:modulos.publicar')->name('modulos.index');
         Route::post('modulos', [ModuloController::class, 'store'])->middleware('permission:modulos.publicar')->name('modulos.store');
         Route::get('auditoria', AuditoriaController::class)->middleware('permission:usuarios.administrar')->name('auditoria.index');
