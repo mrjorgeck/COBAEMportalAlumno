@@ -8,6 +8,7 @@ use App\Models\CicloIngreso;
 use App\Models\ClaveRespuesta;
 use App\Models\DocumentoAlumno;
 use App\Models\Examen;
+use App\Models\GrupoPropedeutico;
 use App\Models\ImportacionCsv;
 use App\Models\Plantel;
 use App\Models\ProcesoIngreso;
@@ -94,6 +95,31 @@ class ProcesarImportacionCsv implements ShouldQueue
                     $calculo->importarResultado($proceso, $examen, $data);
                 }
 
+                $actualizados++;
+
+                continue;
+            }
+
+            if ($importacion->tipo_importacion === 'grupo_propedeutico') {
+                $ciclo = CicloIngreso::where('anio', (int) ($data['ciclo'] ?? 2026))->first() ?? CicloIngreso::vigente();
+                $grupo = GrupoPropedeutico::where('ciclo_ingreso_id', $ciclo->id)
+                    ->where('nombre', trim($data['grupo'] ?? ''))
+                    ->first();
+                $proceso = ProcesoIngreso::where('ciclo_ingreso_id', $ciclo->id)
+                    ->where(function ($query) use ($data) {
+                        $query->where('folio_examen', trim($data['folio_examen'] ?? ''))
+                            ->orWhereHas('alumno', fn ($q) => $q->where('curp', mb_strtoupper(trim($data['curp'] ?? ''))));
+                    })
+                    ->first();
+
+                if (! $grupo || ! $proceso) {
+                    $errores++;
+                    $resumen[] = ['fila' => $total + 1, 'error' => 'Grupo o alumno no encontrado'];
+
+                    continue;
+                }
+
+                $proceso->update(['grupo_propedeutico_id' => $grupo->id]);
                 $actualizados++;
 
                 continue;

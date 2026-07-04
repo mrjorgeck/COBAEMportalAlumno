@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\EstadoDocumento;
 use App\Http\Controllers\Controller;
 use App\Models\DocumentoAlumno;
+use App\Models\GrupoPropedeutico;
 use App\Models\ProcesoIngreso;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,8 +37,12 @@ class AlumnoAdminController extends Controller
     public function show(ProcesoIngreso $proceso): View
     {
         $proceso->load(['alumno', 'ciclo', 'plantel', 'contacto', 'tutor', 'madre', 'otrosDatos', 'documentos.tipoDocumento']);
+        $gruposPropedeuticos = GrupoPropedeutico::where('ciclo_ingreso_id', $proceso->ciclo_ingreso_id)
+            ->where('activo', true)
+            ->orderBy('nombre')
+            ->get();
 
-        return view('admin.alumnos.show', compact('proceso'));
+        return view('admin.alumnos.show', compact('proceso', 'gruposPropedeuticos'));
     }
 
     public function update(Request $request, ProcesoIngreso $proceso): RedirectResponse

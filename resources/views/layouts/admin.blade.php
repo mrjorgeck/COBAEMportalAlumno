@@ -32,6 +32,9 @@
                 <a href="{{ route('admin.examenes.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Examenes</a>
                 <a href="{{ route('admin.materiales.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Materiales</a>
             @endcan
+            @can('grupos.asignar')
+                <a href="{{ route('admin.grupos-propedeuticos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Propedeutico</a>
+            @endcan
             @can('avisos.publicar')
                 <a href="{{ route('admin.avisos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Avisos</a>
             @endcan

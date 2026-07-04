@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\CsvController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamenController;
+use App\Http\Controllers\Admin\GrupoPropedeuticoController;
 use App\Http\Controllers\Admin\MaterialRecomendadoController;
 use App\Http\Controllers\Admin\ModuloController;
 use App\Http\Controllers\Alumno\AccesoController;
@@ -65,6 +66,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('alumnos', [AlumnoAdminController::class, 'index'])->middleware('permission:alumnos.ver')->name('alumnos.index');
         Route::get('alumnos/{proceso}', [AlumnoAdminController::class, 'show'])->middleware('permission:alumnos.ver')->name('alumnos.show');
         Route::patch('alumnos/{proceso}', [AlumnoAdminController::class, 'update'])->middleware('permission:alumnos.editar')->name('alumnos.update');
+        Route::post('alumnos/{proceso}/grupo-propedeutico', [GrupoPropedeuticoController::class, 'asignar'])->middleware('permission:grupos.asignar')->name('alumnos.grupo-propedeutico');
         Route::post('alumnos/{proceso}/bloqueo', [AlumnoAdminController::class, 'bloquear'])->middleware('permission:alumnos.bloquear_edicion')->name('alumnos.bloquear');
         Route::patch('alumnos/{proceso}/documentos/{documento}', [AlumnoAdminController::class, 'actualizarDocumento'])->middleware('permission:documentacion.validar')->name('alumnos.documentos.update');
         Route::get('alumnos/{proceso}/formato', [FormatoController::class, 'admin'])->middleware('permission:formatos.descargar')->name('alumnos.formato');
@@ -77,6 +79,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('examenes', ExamenController::class)->middleware('permission:resultados.cargar')->except(['show', 'create', 'edit']);
         Route::resource('materiales', MaterialRecomendadoController::class)->middleware('permission:resultados.cargar')->except(['show', 'create', 'edit']);
+        Route::resource('grupos-propedeuticos', GrupoPropedeuticoController::class)->middleware('permission:grupos.asignar')->except(['show', 'create', 'edit']);
         Route::resource('avisos', AdminAvisoController::class)->middleware('permission:avisos.publicar')->except(['show']);
         Route::get('catalogos', [CatalogoController::class, 'index'])->middleware('permission:catalogos.administrar')->name('catalogos.index');
         Route::post('catalogos', [CatalogoController::class, 'store'])->middleware('permission:catalogos.administrar')->name('catalogos.store');

@@ -25,6 +25,19 @@
         <div class="rounded bg-white p-4 shadow-sm">
             <h2 class="font-semibold">Acciones</h2>
             <a class="mt-3 inline-block rounded bg-gray-200 px-4 py-2" href="{{ route('admin.alumnos.formato', $proceso) }}">Descargar PDF</a>
+            @can('grupos.asignar')
+                <form method="POST" action="{{ route('admin.alumnos.grupo-propedeutico', $proceso) }}" class="mt-3">
+                    @csrf
+                    <label class="text-sm font-semibold">Grupo propedeutico</label>
+                    <select name="grupo_propedeutico_id" class="mt-2 w-full rounded border-gray-300">
+                        <option value="">Sin asignar</option>
+                        @foreach ($gruposPropedeuticos as $grupo)
+                            <option value="{{ $grupo->id }}" @selected($proceso->grupo_propedeutico_id === $grupo->id)>{{ $grupo->nombre }}</option>
+                        @endforeach
+                    </select>
+                    <button class="mt-2 rounded bg-gray-800 px-3 py-1 text-white">Asignar grupo</button>
+                </form>
+            @endcan
             <form method="POST" action="{{ route('admin.alumnos.bloquear', $proceso) }}" class="mt-3">
                 @csrf
                 <button class="rounded bg-cobaem-900 px-4 py-2 text-white">{{ $proceso->edicion_bloqueada ? 'Desbloquear edicion' : 'Bloquear edicion' }}</button>

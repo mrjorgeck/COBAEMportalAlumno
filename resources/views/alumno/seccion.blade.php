@@ -57,6 +57,23 @@
                 <p class="rounded bg-white p-4 text-sm shadow-sm">No hay areas de mejora prioritarias publicadas.</p>
             @endforelse
         </div>
+    @elseif ($seccion === 'propedeutico')
+        <div class="mt-4 rounded bg-white p-4 shadow-sm">
+            @if ($proceso->grupoPropedeutico)
+                <p class="text-sm text-gray-600">Tu grupo propedeutico asignado es:</p>
+                <p class="text-2xl font-bold text-cobaem-900">{{ $proceso->grupoPropedeutico->nombre }}</p>
+                <dl class="mt-4 space-y-2 text-sm">
+                    <div><dt class="font-semibold">Horario</dt><dd>{{ $proceso->grupoPropedeutico->horario_texto ?? 'Por confirmar' }}</dd></div>
+                    <div><dt class="font-semibold">Aula</dt><dd>{{ $proceso->grupoPropedeutico->aula ?? 'Por confirmar' }}</dd></div>
+                    <div><dt class="font-semibold">Inicio</dt><dd>{{ $proceso->grupoPropedeutico->fecha_inicio?->translatedFormat('d/m/Y') ?? 'Por confirmar' }}</dd></div>
+                    <div><dt class="font-semibold">Responsable</dt><dd>{{ $proceso->grupoPropedeutico->responsable ?? 'Por confirmar' }}</dd></div>
+                    <div><dt class="font-semibold">Indicaciones</dt><dd>{{ $proceso->grupoPropedeutico->indicaciones ?? 'Por confirmar' }}</dd></div>
+                    <div><dt class="font-semibold">Materiales requeridos</dt><dd>{{ $proceso->grupoPropedeutico->materiales_requeridos ?? 'Por confirmar' }}</dd></div>
+                </dl>
+            @else
+                <p class="text-sm">Tu grupo propedeutico aun no ha sido asignado.</p>
+            @endif
+        </div>
     @elseif ($seccion === 'materiales')
         <div class="mt-4 space-y-3">
             @forelse ($materiales as $material)
