@@ -29,7 +29,8 @@ class MiProcesoController extends Controller
 
     public function seccion(Request $request, string $seccion): View|RedirectResponse
     {
-        if (in_array($seccion, ['datos', 'documentacion'], true) && ! $request->session()->get('alumno_nivel_sensible', false)) {
+        $sensibles = ['datos', 'documentacion', 'resultados', 'areas-mejora', 'evaluacion-posterior', 'avance', 'materiales'];
+        if (in_array($seccion, $sensibles, true) && ! $request->session()->get('alumno_nivel_sensible', false)) {
             return redirect()->route('alumno.verificacion');
         }
 
@@ -47,7 +48,12 @@ class MiProcesoController extends Controller
                 ->get();
         }
 
-        return view('alumno.seccion', compact('proceso', 'seccion', 'avisos'));
+        $resultadoInicial = $proceso->resultados
+            ->first(fn ($resultado) => $resultado->examen->tipo === 'diagnostico_inicial');
+        $resultadoPosterior = $proceso->resultados
+            ->first(fn ($resultado) => $resultado->examen->tipo === 'evaluacion_posterior');
+
+        return view('alumno.seccion', compact('proceso', 'seccion', 'avisos', 'resultadoInicial', 'resultadoPosterior'));
     }
 
     public function marcarAviso(Request $request, Aviso $aviso): RedirectResponse
@@ -62,7 +68,17 @@ class MiProcesoController extends Controller
 
     private function proceso(Request $request): ProcesoIngreso
     {
-        return ProcesoIngreso::with(['alumno', 'documentos.tipoDocumento', 'descargasFormato'])
+        return ProcesoIngreso::with([
+            'alumno',
+            'documentos.tipoDocumento',
+            'descargasFormato',
+            'resultados.examen',
+            'resultados.nivelRiesgo',
+            'resultados.nivelDesempeno',
+            'resultados.areas.area',
+            'resultados.areas.nivelRiesgo',
+            'grupoPropedeutico',
+        ])
             ->findOrFail($request->session()->get('alumno_proceso_id'));
     }
 }
