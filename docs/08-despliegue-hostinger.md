@@ -21,11 +21,14 @@ Hostinger compartido no permite cambiar document root arbitrariamente, así que 
 
 ```
 /home/u132762550/
-├── apps/portal/                  # repositorio Laravel (git clone)
-│   ├── .env                      # SOLO aquí: credenciales de producción
-│   ├── public/ ...
+├── apps/portal/                  # repositorio completo (git clone)
+│   ├── deploy/
+│   ├── docs/
+│   └── portal/                   # aplicación Laravel
+│       ├── .env                  # SOLO aquí: credenciales de producción
+│       ├── public/ ...
 └── domains/ariocentro.com/public_html/registrocobaemario/
-        → symlink a /home/u132762550/apps/portal/public
+        → symlink a /home/u132762550/apps/portal/portal/public
 ```
 
 Si el panel no permite symlink del folder del subdominio: alternativa soportada — dejar el subdominio apuntando a su carpeta y crear dentro un symlink a `public`, o mover el contenido de `public/` y ajustar `index.php` (última opción, documentar si se usa).
@@ -61,7 +64,7 @@ MAIL_MAILER=smtp   # SMTP de Hostinger si se usa correo
 
 ### 1.6 Cron (hPanel → Avanzado → Cron Jobs)
 ```
-* * * * * cd /home/u132762550/apps/portal && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /home/u132762550/apps/portal/portal && php artisan schedule:run >> /dev/null 2>&1
 ```
 El scheduler ejecuta: `queue:work --stop-when-empty --max-time=50` cada minuto (jobs de CSV/OMR), backups diarios, limpieza de sesiones. Sin workers persistentes (limitación del plan compartido).
 
@@ -73,19 +76,23 @@ Los assets se compilan **localmente** (no hay Node garantizado en el servidor): 
 #!/usr/bin/env bash
 set -euo pipefail
 SERVER="u132762550@<host> -p 65002"
-APP="/home/u132762550/apps/portal"
+REPO="/home/u132762550/apps/portal"
+APP="$REPO/portal"
 
 # 1. Build local de assets
+cd portal
 npm ci && npm run build
+cd ..
 
 # 2. Subir assets compilados
-rsync -avz -e "ssh -p 65002" public/build/ u132762550@<host>:$APP/public/build/
+rsync -avz -e "ssh -p 65002" portal/public/build/ u132762550@<host>:$APP/public/build/
 
 # 3. Actualizar código y dependencias en servidor
 ssh $SERVER bash -s <<'EOF'
 cd /home/u132762550/apps/portal
-php artisan down --retry=30
+php portal/artisan down --retry=30
 git pull origin main
+cd portal
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan config:cache && php artisan route:cache && php artisan view:cache
@@ -99,13 +106,13 @@ Verificar versión de PHP CLI en servidor (`php -v`); si el CLI default no es 8.
 
 ```bash
 ssh -p 65002 u132762550@<host>
-cd ~/apps && git clone <repo> portal && cd portal
+cd ~/apps && git clone <repo> portal && cd portal/portal
 composer install --no-dev --optimize-autoloader
 cp .env.example .env   # editar con credenciales reales
 php artisan key:generate
 php artisan migrate --force --seed          # seeders: catálogos, plantel, ciclo, admin
 php artisan storage:link
-# crear symlink del subdominio → public/ (ver 1.3)
+# crear symlink del subdominio → /home/u132762550/apps/portal/portal/public (ver 1.3)
 ```
 
 ## 4. Entornos

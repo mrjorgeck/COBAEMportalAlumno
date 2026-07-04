@@ -12,7 +12,8 @@ set -euo pipefail
 SSH_USER="${DEPLOY_SSH_USER:-u132762550}"
 SSH_HOST="${DEPLOY_SSH_HOST:?Define DEPLOY_SSH_HOST (host SSH de Hostinger)}"
 SSH_PORT="${DEPLOY_SSH_PORT:-65002}"
-APP_DIR="/home/${SSH_USER}/apps/portal"
+REPO_DIR="/home/${SSH_USER}/apps/portal"
+APP_DIR="${REPO_DIR}/portal"
 BRANCH="${DEPLOY_BRANCH:-main}"
 PHP_BIN="${DEPLOY_PHP_BIN:-php}"   # ajustar si el CLI 8.3 tiene otra ruta
 # ─────────────────────────────────────────────────────────────────────────────
@@ -37,10 +38,11 @@ $SSH "cd ${APP_DIR} && ${PHP_BIN} artisan db:backup-predeploy || \
 echo "==> 4/4 Actualizando aplicación en el servidor"
 $SSH bash -s <<EOF
 set -euo pipefail
-cd ${APP_DIR}
-${PHP_BIN} artisan down --retry=30 || true
+cd ${REPO_DIR}
+${PHP_BIN} portal/artisan down --retry=30 || true
 git fetch origin ${BRANCH}
 git reset --hard origin/${BRANCH}
+cd ${APP_DIR}
 composer install --no-dev --optimize-autoloader --no-interaction
 ${PHP_BIN} artisan migrate --force
 ${PHP_BIN} artisan config:cache
