@@ -13,6 +13,7 @@ use App\Models\Plantel;
 use App\Models\ProcesoIngreso;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RegistroAlumnoService
 {
@@ -23,6 +24,25 @@ class RegistroAlumnoService
         return DB::transaction(function () use ($data) {
             $ciclo = CicloIngreso::vigente();
             $plantel = Plantel::where('activo', true)->firstOrFail();
+
+            // Regla crítica #4 (RF-15 / SEG-06): el cierre de ventana o el
+            // bloqueo impiden ESCRIBIR; la consulta permanece disponible.
+            if ($ciclo === null || ! $ciclo->registroAbierto()) {
+                throw ValidationException::withMessages([
+                    'curp' => 'El periodo de registro y edición no está abierto. Puedes seguir consultando tu proceso.',
+                ]);
+            }
+
+            $edicionBloqueada = ProcesoIngreso::where('ciclo_ingreso_id', $ciclo->id)
+                ->where('edicion_bloqueada', true)
+                ->whereHas('alumno', fn ($q) => $q->where('curp', mb_strtoupper($data['curp'])))
+                ->exists();
+
+            if ($edicionBloqueada) {
+                throw ValidationException::withMessages([
+                    'curp' => 'La edición de tu registro está bloqueada. Puedes seguir consultando tu proceso; para correcciones acude a control escolar.',
+                ]);
+            }
 
             $alumno = Alumno::updateOrCreate(
                 ['curp' => mb_strtoupper($data['curp'])],
