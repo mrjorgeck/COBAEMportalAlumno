@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
+@source '../../app/Livewire/**/*.php';
+
+@theme {
+    /* Identidad institucional COBAEM (ajustar a los colores oficiales) */
+    --color-cobaem-900: #1e3a5f;
+    --color-cobaem-700: #27548c;
+    --color-cobaem-500: #3b74b8;
+    --color-cobaem-100: #e8f0f9;
+    --color-dorado-500: #c9a227;
+}
