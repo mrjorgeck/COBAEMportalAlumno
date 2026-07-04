@@ -5,7 +5,9 @@ namespace App\Jobs;
 use App\Models\Alumno;
 use App\Models\Catalogo;
 use App\Models\CicloIngreso;
+use App\Models\ClaveRespuesta;
 use App\Models\DocumentoAlumno;
+use App\Models\Examen;
 use App\Models\ImportacionCsv;
 use App\Models\Plantel;
 use App\Models\ProcesoIngreso;
@@ -34,6 +36,36 @@ class ProcesarImportacionCsv implements ShouldQueue
         while (($row = fgetcsv($handle)) !== false) {
             $total++;
             $data = array_combine($headers, $row) ?: [];
+
+            if ($importacion->tipo_importacion === 'clave_respuestas') {
+                $examen = Examen::find((int) ($data['examen_id'] ?? 0));
+                $area = Catalogo::where('tipo', 'area_evaluacion')->where('clave', trim($data['area_clave'] ?? ''))->first();
+                $materia = filled($data['materia_clave'] ?? null)
+                    ? Catalogo::where('tipo', 'materia')->where('clave', trim($data['materia_clave']))->first()
+                    : null;
+
+                if (! $examen || ! $area || blank($data['pregunta'] ?? null) || blank($data['respuesta_correcta'] ?? null)) {
+                    $errores++;
+                    $resumen[] = ['fila' => $total + 1, 'error' => 'Examen, pregunta, respuesta o area no encontrados'];
+
+                    continue;
+                }
+
+                ClaveRespuesta::updateOrCreate(
+                    ['examen_id' => $examen->id, 'pregunta' => (int) $data['pregunta']],
+                    [
+                        'respuesta_correcta' => mb_strtoupper(trim($data['respuesta_correcta']))[0],
+                        'area_id' => $area->id,
+                        'materia_id' => $materia?->id,
+                        'competencia' => $data['competencia'] ?? null,
+                        'ponderacion' => (float) ($data['ponderacion'] ?? 1),
+                    ],
+                );
+                $actualizados++;
+
+                continue;
+            }
+
             $curp = mb_strtoupper(trim($data['curp'] ?? ''));
 
             if (! $validator->esValida($curp)) {

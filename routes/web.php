@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AvisoController as AdminAvisoController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\CsvController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExamenController;
 use App\Http\Controllers\Admin\ModuloController;
 use App\Http\Controllers\Alumno\AccesoController;
 use App\Http\Controllers\Alumno\FormatoController;
@@ -30,7 +31,7 @@ Route::post('/seleccionar-ciclo', [AccesoController::class, 'seleccionarCiclo'])
 Route::get('/verificacion', [VerificacionController::class, 'create'])->middleware('alumno.sesion')->name('alumno.verificacion');
 Route::post('/verificacion', [VerificacionController::class, 'store'])->middleware(['alumno.sesion', 'throttle:10,1'])->name('alumno.verificacion.store');
 Route::get('/registro', [RegistroController::class, 'create'])->name('alumno.registro');
-Route::post('/registro', [RegistroController::class, 'store'])->name('alumno.registro.store');
+Route::post('/registro', [RegistroController::class, 'store'])->middleware('throttle:10,1')->name('alumno.registro.store');
 Route::get('/registro/exito', [RegistroController::class, 'exito'])->middleware('alumno.sesion:sensible')->name('alumno.registro.exito');
 Route::get('/mi-proceso', [MiProcesoController::class, 'index'])->middleware('alumno.sesion')->name('alumno.mi-proceso');
 Route::get('/mi-proceso/formato/descargar', [FormatoController::class, 'alumno'])->middleware('alumno.sesion:sensible')->name('alumno.formato.descargar');
@@ -70,8 +71,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('exportaciones', [CsvController::class, 'exportaciones'])->middleware('permission:csv.exportar')->name('exportaciones');
         Route::get('exportaciones/alumnos', [CsvController::class, 'exportarAlumnos'])->middleware('permission:csv.exportar')->name('exportaciones.alumnos');
         Route::get('importaciones', [CsvController::class, 'importaciones'])->middleware('permission:csv.importar')->name('importaciones');
+        Route::get('importaciones/plantilla/{tipo}', [CsvController::class, 'plantilla'])->middleware('permission:csv.importar')->name('importaciones.plantilla');
         Route::post('importaciones', [CsvController::class, 'importar'])->middleware('permission:csv.importar')->name('importaciones.store');
 
+        Route::resource('examenes', ExamenController::class)->middleware('permission:resultados.cargar')->except(['show', 'create', 'edit']);
         Route::resource('avisos', AdminAvisoController::class)->middleware('permission:avisos.publicar')->except(['show']);
         Route::get('catalogos', [CatalogoController::class, 'index'])->middleware('permission:catalogos.administrar')->name('catalogos.index');
         Route::post('catalogos', [CatalogoController::class, 'store'])->middleware('permission:catalogos.administrar')->name('catalogos.store');

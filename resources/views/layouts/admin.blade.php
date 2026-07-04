@@ -28,6 +28,9 @@
             @can('csv.importar')
                 <a href="{{ route('admin.importaciones') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Importaciones</a>
             @endcan
+            @can('resultados.cargar')
+                <a href="{{ route('admin.examenes.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Examenes</a>
+            @endcan
             @can('avisos.publicar')
                 <a href="{{ route('admin.avisos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Avisos</a>
             @endcan

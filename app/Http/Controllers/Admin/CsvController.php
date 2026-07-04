@@ -49,7 +49,7 @@ class CsvController extends Controller
     public function importar(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'tipo_importacion' => ['required', 'in:alumnos,documentacion'],
+            'tipo_importacion' => ['required', 'in:alumnos,documentacion,clave_respuestas,resultados_examen,respuestas_examen,grupo_propedeutico'],
             'archivo' => ['required', 'file', 'mimes:csv,txt'],
         ]);
 
@@ -64,5 +64,29 @@ class CsvController extends Controller
         ProcesarImportacionCsv::dispatch($importacion->id);
 
         return back()->with('mensaje', 'Importación encolada para procesamiento.');
+    }
+
+    public function plantilla(string $tipo): StreamedResponse
+    {
+        $plantillas = [
+            'clave_respuestas' => ['examen_id', 'pregunta', 'respuesta_correcta', 'area_clave', 'materia_clave', 'competencia', 'ponderacion'],
+            'respuestas_examen' => ['examen_id', 'folio_examen', '1', '2', '3'],
+            'resultados_examen' => ['examen_id', 'folio_examen', 'puntaje_total', 'porcentaje_total', 'nivel_riesgo_clave', 'nivel_desempeno_clave', 'MAT_puntaje', 'MAT_porcentaje', 'MAT_riesgo'],
+            'grupo_propedeutico' => ['ciclo', 'curp', 'folio_examen', 'grupo'],
+        ];
+
+        abort_unless(array_key_exists($tipo, $plantillas), 404);
+
+        return response()->streamDownload(function () use ($plantillas, $tipo): void {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, $plantillas[$tipo]);
+            fputcsv($out, match ($tipo) {
+                'clave_respuestas' => [1, 1, 'A', 'MAT', '', 'Operaciones basicas', 1],
+                'respuestas_examen' => [1, 'EX-001', 'A', 'B', 'C'],
+                'resultados_examen' => [1, 'EX-001', 8, 80, 'BAJO', 'ADECUADO', 4, 80, 'BAJO'],
+                default => [2026, 'AEXA000101HMNXXXA1', 'EX-001', 'P-03'],
+            });
+            fclose($out);
+        }, $tipo.'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 }
