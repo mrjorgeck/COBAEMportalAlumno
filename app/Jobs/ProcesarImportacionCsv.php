@@ -11,6 +11,7 @@ use App\Models\Examen;
 use App\Models\ImportacionCsv;
 use App\Models\Plantel;
 use App\Models\ProcesoIngreso;
+use App\Services\CalculoResultadosService;
 use App\Services\CurpValidator;
 use App\Services\FolioService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,7 +24,7 @@ class ProcesarImportacionCsv implements ShouldQueue
 
     public function __construct(public int $importacionId) {}
 
-    public function handle(CurpValidator $validator, FolioService $folioService): void
+    public function handle(CurpValidator $validator, FolioService $folioService, CalculoResultadosService $calculo): void
     {
         $importacion = ImportacionCsv::findOrFail($this->importacionId);
         $importacion->update(['estado' => 'procesando']);
@@ -61,6 +62,38 @@ class ProcesarImportacionCsv implements ShouldQueue
                         'ponderacion' => (float) ($data['ponderacion'] ?? 1),
                     ],
                 );
+                $actualizados++;
+
+                continue;
+            }
+
+            if (in_array($importacion->tipo_importacion, ['respuestas_examen', 'resultados_examen'], true)) {
+                $examen = Examen::find((int) ($data['examen_id'] ?? 0));
+                $proceso = $examen
+                    ? ProcesoIngreso::where('ciclo_ingreso_id', $examen->ciclo_ingreso_id)
+                        ->where('folio_examen', trim($data['folio_examen'] ?? ''))
+                        ->first()
+                    : null;
+
+                if (! $examen || ! $proceso) {
+                    $errores++;
+                    $resumen[] = ['fila' => $total + 1, 'error' => 'Examen o folio de examen no encontrado'];
+
+                    continue;
+                }
+
+                if ($importacion->tipo_importacion === 'respuestas_examen') {
+                    $respuestas = [];
+                    foreach ($data as $columna => $valor) {
+                        if (ctype_digit((string) $columna)) {
+                            $respuestas[(int) $columna] = $valor;
+                        }
+                    }
+                    $calculo->calcularDesdeRespuestas($proceso, $examen, $respuestas);
+                } else {
+                    $calculo->importarResultado($proceso, $examen, $data);
+                }
+
                 $actualizados++;
 
                 continue;

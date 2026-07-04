@@ -75,6 +75,17 @@ class CatalogoSeeder extends Seeder
         ]);
 
         // Niveles de riesgo con rangos configurables en metadata (§13.5)
+        $desempenos = [
+            'INSUF' => ['min' => 0, 'max' => 39.99],
+            'BASICO' => ['min' => 40, 'max' => 59.99],
+            'MEDIO' => ['min' => 60, 'max' => 79.99],
+            'ADECUADO' => ['min' => 80, 'max' => 89.99],
+            'SOBRES' => ['min' => 90, 'max' => 100],
+        ];
+        foreach ($desempenos as $clave => $metadata) {
+            Catalogo::where('tipo', 'nivel_desempeno')->where('clave', $clave)->update(['metadata' => $metadata]);
+        }
+
         $riesgos = [
             'BAJO' => ['nombre' => 'Bajo', 'metadata' => ['min' => 80, 'max' => 100]],
             'MEDIO' => ['nombre' => 'Medio', 'metadata' => ['min' => 60, 'max' => 79.99]],
