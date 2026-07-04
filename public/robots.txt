@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin
+Disallow: /mi-proceso
+Disallow: /registro
+Disallow: /verificacion
