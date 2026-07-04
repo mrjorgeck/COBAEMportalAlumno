@@ -42,6 +42,49 @@
                 <p class="text-sm">Tus resultados aun no han sido publicados.</p>
             @endif
         </div>
+    @elseif ($seccion === 'evaluacion-posterior')
+        <div class="mt-4 rounded bg-white p-4 shadow-sm">
+            @if ($resultadoPosterior)
+                <p class="text-sm text-gray-600">Resultado posterior al propedeutico</p>
+                <p class="text-3xl font-bold text-cobaem-900">{{ number_format((float) $resultadoPosterior->porcentaje_total, 2) }}%</p>
+                <p class="mt-1 text-sm">Nivel: {{ $resultadoPosterior->nivelDesempeno->nombre }} · Riesgo {{ $resultadoPosterior->nivelRiesgo->nombre }}</p>
+            @else
+                <p class="text-sm">Tu evaluacion posterior aun no ha sido publicada.</p>
+            @endif
+        </div>
+    @elseif ($seccion === 'avance')
+        <div class="mt-4 rounded bg-white p-4 shadow-sm">
+            @if ($resultadoInicial && $resultadoPosterior)
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead><tr class="border-b"><th class="py-2">Area</th><th>Diagnostico inicial</th><th>Despues del propedeutico</th><th>Avance</th></tr></thead>
+                        <tbody>
+                            @foreach ($resultadoInicial->areas as $areaInicial)
+                                @php
+                                    $areaPosterior = $resultadoPosterior->areas->firstWhere('area_id', $areaInicial->area_id);
+                                    $avance = $areaPosterior ? ((float) $areaPosterior->porcentaje - (float) $areaInicial->porcentaje) : null;
+                                @endphp
+                                <tr class="border-b">
+                                    <td class="py-2">{{ $areaInicial->area->nombre }}</td>
+                                    <td>{{ number_format((float) $areaInicial->porcentaje, 2) }}%</td>
+                                    <td>{{ $areaPosterior ? number_format((float) $areaPosterior->porcentaje, 2).'%' : 'Sin dato' }}</td>
+                                    <td>{{ $avance === null ? 'Sin dato' : sprintf('%+0.2f', $avance) }}</td>
+                                </tr>
+                            @endforeach
+                            @php $avanceTotal = (float) $resultadoPosterior->porcentaje_total - (float) $resultadoInicial->porcentaje_total; @endphp
+                            <tr class="font-semibold">
+                                <td class="py-2">Total</td>
+                                <td>{{ number_format((float) $resultadoInicial->porcentaje_total, 2) }}%</td>
+                                <td>{{ number_format((float) $resultadoPosterior->porcentaje_total, 2) }}%</td>
+                                <td>{{ sprintf('%+0.2f', $avanceTotal) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="text-sm">El comparativo estara disponible cuando existan ambas evaluaciones.</p>
+            @endif
+        </div>
     @elseif ($seccion === 'areas-mejora')
         <div class="mt-4 space-y-3">
             @php
