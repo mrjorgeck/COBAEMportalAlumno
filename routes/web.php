@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\AvisoController as AdminAvisoController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\CsvController;
+use App\Http\Controllers\Admin\DashboardAcademicoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamenController;
 use App\Http\Controllers\Admin\GrupoPropedeuticoController;
@@ -62,6 +63,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', DashboardController::class)
             ->middleware('permission:dashboard.registros')
             ->name('dashboard');
+        Route::get('dashboard-academico', DashboardAcademicoController::class)
+            ->middleware('permission:dashboard.academico')
+            ->name('dashboard-academico');
 
         Route::get('alumnos', [AlumnoAdminController::class, 'index'])->middleware('permission:alumnos.ver')->name('alumnos.index');
         Route::get('alumnos/{proceso}', [AlumnoAdminController::class, 'show'])->middleware('permission:alumnos.ver')->name('alumnos.show');

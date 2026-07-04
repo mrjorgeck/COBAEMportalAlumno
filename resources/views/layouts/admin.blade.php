@@ -19,6 +19,9 @@
             @can('dashboard.registros')
                 <a href="{{ route('admin.dashboard') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Dashboard</a>
             @endcan
+            @can('dashboard.academico')
+                <a href="{{ route('admin.dashboard-academico') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Dashboard academico</a>
+            @endcan
             @can('alumnos.ver')
                 <a href="{{ route('admin.alumnos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Alumnos</a>
             @endcan
