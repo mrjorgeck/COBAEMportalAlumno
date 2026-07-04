@@ -20,6 +20,7 @@
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'documentacion') }}">Documentacion</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'resultados') }}">Evaluacion diagnostica</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'areas-mejora') }}">Areas de mejora</a>
+        <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'materiales') }}">Materiales recomendados</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'avisos') }}">Avisos</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.formato.descargar') }}">Formato de inscripcion</a>
     </nav>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Alumno;
 
 use App\Http\Controllers\Controller;
 use App\Models\Aviso;
+use App\Models\MaterialRecomendado;
 use App\Models\ProcesoIngreso;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -53,7 +54,24 @@ class MiProcesoController extends Controller
         $resultadoPosterior = $proceso->resultados
             ->first(fn ($resultado) => $resultado->examen->tipo === 'evaluacion_posterior');
 
-        return view('alumno.seccion', compact('proceso', 'seccion', 'avisos', 'resultadoInicial', 'resultadoPosterior'));
+        $areasDebiles = $resultadoInicial?->areas
+            ->filter(fn ($area) => in_array($area->nivelRiesgo->clave, ['ALTO', 'CRITICO'], true))
+            ->pluck('area_id')
+            ->all() ?? [];
+        $materiales = collect();
+        if ($seccion === 'materiales' && $resultadoInicial) {
+            $materiales = MaterialRecomendado::with(['area', 'nivelDesempeno'])
+                ->where('activo', true)
+                ->whereIn('area_id', $areasDebiles)
+                ->where(function ($query) use ($resultadoInicial) {
+                    $query->whereNull('nivel_desempeno_id')
+                        ->orWhere('nivel_desempeno_id', $resultadoInicial->nivel_desempeno_id);
+                })
+                ->orderBy('titulo')
+                ->get();
+        }
+
+        return view('alumno.seccion', compact('proceso', 'seccion', 'avisos', 'resultadoInicial', 'resultadoPosterior', 'materiales'));
     }
 
     public function marcarAviso(Request $request, Aviso $aviso): RedirectResponse

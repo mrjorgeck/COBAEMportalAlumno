@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\CsvController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamenController;
+use App\Http\Controllers\Admin\MaterialRecomendadoController;
 use App\Http\Controllers\Admin\ModuloController;
 use App\Http\Controllers\Alumno\AccesoController;
 use App\Http\Controllers\Alumno\FormatoController;
@@ -75,6 +76,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('importaciones', [CsvController::class, 'importar'])->middleware('permission:csv.importar')->name('importaciones.store');
 
         Route::resource('examenes', ExamenController::class)->middleware('permission:resultados.cargar')->except(['show', 'create', 'edit']);
+        Route::resource('materiales', MaterialRecomendadoController::class)->middleware('permission:resultados.cargar')->except(['show', 'create', 'edit']);
         Route::resource('avisos', AdminAvisoController::class)->middleware('permission:avisos.publicar')->except(['show']);
         Route::get('catalogos', [CatalogoController::class, 'index'])->middleware('permission:catalogos.administrar')->name('catalogos.index');
         Route::post('catalogos', [CatalogoController::class, 'store'])->middleware('permission:catalogos.administrar')->name('catalogos.store');

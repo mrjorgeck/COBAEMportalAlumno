@@ -57,6 +57,23 @@
                 <p class="rounded bg-white p-4 text-sm shadow-sm">No hay areas de mejora prioritarias publicadas.</p>
             @endforelse
         </div>
+    @elseif ($seccion === 'materiales')
+        <div class="mt-4 space-y-3">
+            @forelse ($materiales as $material)
+                <article class="rounded bg-white p-4 shadow-sm">
+                    <p class="font-semibold">{{ $material->titulo }}</p>
+                    <p class="text-sm text-gray-600">{{ $material->area->nombre }} · {{ str_replace('_', ' ', $material->tipo_material) }}</p>
+                    @if ($material->descripcion)
+                        <p class="mt-2 text-sm">{{ $material->descripcion }}</p>
+                    @endif
+                    @if ($material->url)
+                        <a class="mt-3 inline-block text-sm font-semibold text-cobaem-900" href="{{ $material->url }}" target="_blank" rel="noopener">Abrir material</a>
+                    @endif
+                </article>
+            @empty
+                <p class="rounded bg-white p-4 text-sm shadow-sm">No hay materiales recomendados publicados para tus areas de mejora.</p>
+            @endforelse
+        </div>
     @elseif ($seccion === 'avisos')
         <div class="mt-4 space-y-3">
             @forelse ($avisos as $aviso)
