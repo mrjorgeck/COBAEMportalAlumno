@@ -92,4 +92,19 @@ class ProcesoIngreso extends Model
     {
         return $this->hasMany(DescargaFormato::class);
     }
+
+    public function resultados(): HasMany
+    {
+        return $this->hasMany(Resultado::class);
+    }
+
+    public function grupoPropedeutico(): BelongsTo
+    {
+        return $this->belongsTo(GrupoPropedeutico::class, 'grupo_propedeutico_id');
+    }
+
+    public function hojasRespuesta(): HasMany
+    {
+        return $this->hasMany(HojaRespuesta::class);
+    }
 }
