@@ -37,6 +37,23 @@
                     </select>
                     <button class="mt-2 rounded bg-gray-800 px-3 py-1 text-white">Asignar grupo</button>
                 </form>
+                <form method="POST" action="{{ route('admin.alumnos.grupo-escolar', $proceso) }}" class="mt-3">
+                    @csrf
+                    <label class="text-sm font-semibold">Grupo escolar</label>
+                    <select name="grupo_escolar_id" class="mt-2 w-full rounded border-gray-300">
+                        <option value="">Sin asignar</option>
+                        @foreach ($gruposEscolares as $grupo)
+                            <option value="{{ $grupo->id }}" @selected($proceso->grupo_escolar_id === $grupo->id)>{{ $grupo->grupo }}</option>
+                        @endforeach
+                    </select>
+                    <button class="mt-2 rounded bg-gray-800 px-3 py-1 text-white">Asignar grupo escolar</button>
+                </form>
+                <form method="POST" action="{{ route('admin.alumnos.matricula', $proceso) }}" class="mt-3">
+                    @csrf
+                    <label class="text-sm font-semibold">Matricula</label>
+                    <input name="matricula" value="{{ old('matricula', $proceso->matricula) }}" class="mt-2 w-full rounded border-gray-300">
+                    <button class="mt-2 rounded bg-gray-800 px-3 py-1 text-white">Guardar matricula</button>
+                </form>
             @endcan
             <form method="POST" action="{{ route('admin.alumnos.bloquear', $proceso) }}" class="mt-3">
                 @csrf

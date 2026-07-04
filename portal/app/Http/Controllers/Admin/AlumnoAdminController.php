@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\EstadoDocumento;
 use App\Http\Controllers\Controller;
 use App\Models\DocumentoAlumno;
+use App\Models\GrupoEscolar;
 use App\Models\GrupoPropedeutico;
 use App\Models\ProcesoIngreso;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AlumnoAdminController extends Controller
@@ -36,13 +38,17 @@ class AlumnoAdminController extends Controller
 
     public function show(ProcesoIngreso $proceso): View
     {
-        $proceso->load(['alumno', 'ciclo', 'plantel', 'contacto', 'tutor', 'madre', 'otrosDatos', 'documentos.tipoDocumento']);
+        $proceso->load(['alumno', 'ciclo', 'plantel', 'contacto', 'tutor', 'madre', 'otrosDatos', 'documentos.tipoDocumento', 'grupoEscolar']);
         $gruposPropedeuticos = GrupoPropedeutico::where('ciclo_ingreso_id', $proceso->ciclo_ingreso_id)
             ->where('activo', true)
             ->orderBy('nombre')
             ->get();
+        $gruposEscolares = GrupoEscolar::where('ciclo_ingreso_id', $proceso->ciclo_ingreso_id)
+            ->where('activo', true)
+            ->orderBy('grupo')
+            ->get();
 
-        return view('admin.alumnos.show', compact('proceso', 'gruposPropedeuticos'));
+        return view('admin.alumnos.show', compact('proceso', 'gruposPropedeuticos', 'gruposEscolares'));
     }
 
     public function update(Request $request, ProcesoIngreso $proceso): RedirectResponse
@@ -61,6 +67,17 @@ class AlumnoAdminController extends Controller
         $proceso->update(collect($data)->only(['folio_examen', 'estatus_proceso'])->all());
 
         return back()->with('mensaje', 'Alumno actualizado.');
+    }
+
+    public function matricula(Request $request, ProcesoIngreso $proceso): RedirectResponse
+    {
+        $data = $request->validate([
+            'matricula' => ['nullable', 'string', 'max:20', Rule::unique('procesos_ingreso', 'matricula')->ignore($proceso->id)],
+        ]);
+
+        $proceso->update($data);
+
+        return back()->with('mensaje', 'Matricula guardada.');
     }
 
     public function bloquear(ProcesoIngreso $proceso): RedirectResponse
