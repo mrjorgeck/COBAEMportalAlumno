@@ -24,6 +24,11 @@
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'propedeutico') }}">Curso propedeutico</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'evaluacion-posterior') }}">Evaluacion posterior</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'avance') }}">Mi avance</a>
+        <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'grupo-escolar') }}">Grupo escolar</a>
+        <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'matricula') }}">Matricula</a>
+        <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'horario') }}">Horario de clases</a>
+        <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'sicobaem') }}">SICOBaEM</a>
+        <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'regularizacion') }}">Regularizacion autodirigida</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.mi-proceso.seccion', 'avisos') }}">Avisos</a>
         <a class="rounded bg-white p-3 shadow-sm" href="{{ route('alumno.formato.descargar') }}">Formato de inscripcion</a>
     </nav>

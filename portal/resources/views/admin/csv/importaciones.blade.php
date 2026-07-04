@@ -11,12 +11,15 @@
             <option value="respuestas_examen">Respuestas de examen</option>
             <option value="resultados_examen">Resultados de examen</option>
             <option value="grupo_propedeutico">Grupo propedeutico</option>
+            <option value="grupo_escolar">Grupo escolar</option>
+            <option value="matriculas">Matriculas</option>
+            <option value="horarios">Horarios</option>
         </select>
         <input type="file" name="archivo" required class="ml-2">
         <button class="rounded bg-cobaem-900 px-4 py-2 text-white">Importar</button>
     </form>
     <div class="mt-3 flex flex-wrap gap-2 text-sm">
-        @foreach (['clave_respuestas', 'respuestas_examen', 'resultados_examen', 'grupo_propedeutico'] as $tipo)
+        @foreach (['clave_respuestas', 'respuestas_examen', 'resultados_examen', 'grupo_propedeutico', 'grupo_escolar', 'matriculas', 'horarios'] as $tipo)
             <a class="rounded bg-white px-3 py-2 shadow-sm" href="{{ route('admin.importaciones.plantilla', $tipo) }}">Plantilla {{ str_replace('_', ' ', $tipo) }}</a>
         @endforeach
     </div>

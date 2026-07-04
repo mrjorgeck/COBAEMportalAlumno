@@ -37,12 +37,14 @@
             @endcan
             @can('grupos.asignar')
                 <a href="{{ route('admin.grupos-propedeuticos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Propedeutico</a>
+                <a href="{{ route('admin.grupos-escolares.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Grupos escolares</a>
             @endcan
             @can('avisos.publicar')
                 <a href="{{ route('admin.avisos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Avisos</a>
             @endcan
             @can('modulos.publicar')
                 <a href="{{ route('admin.modulos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Modulos</a>
+                <a href="{{ route('admin.sicobaem.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">SICOBaEM</a>
             @endcan
             @can('catalogos.administrar')
                 <a href="{{ route('admin.catalogos.index') }}" class="block rounded px-3 py-2 hover:bg-cobaem-700">Catalogos</a>

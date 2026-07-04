@@ -8,7 +8,9 @@ use App\Models\CicloIngreso;
 use App\Models\ClaveRespuesta;
 use App\Models\DocumentoAlumno;
 use App\Models\Examen;
+use App\Models\GrupoEscolar;
 use App\Models\GrupoPropedeutico;
+use App\Models\Horario;
 use App\Models\ImportacionCsv;
 use App\Models\Plantel;
 use App\Models\ProcesoIngreso;
@@ -120,6 +122,85 @@ class ProcesarImportacionCsv implements ShouldQueue
                 }
 
                 $proceso->update(['grupo_propedeutico_id' => $grupo->id]);
+                $actualizados++;
+
+                continue;
+            }
+
+            if ($importacion->tipo_importacion === 'horarios') {
+                $ciclo = CicloIngreso::where('anio', (int) ($data['ciclo'] ?? 2026))->first() ?? CicloIngreso::vigente();
+                $grupo = GrupoEscolar::where('ciclo_ingreso_id', $ciclo->id)
+                    ->where('grupo', trim($data['grupo'] ?? ''))
+                    ->first();
+
+                if (! $grupo || blank($data['dia'] ?? null) || blank($data['hora_inicio'] ?? null) || blank($data['hora_fin'] ?? null) || blank($data['materia'] ?? null)) {
+                    $errores++;
+                    $resumen[] = ['fila' => $total + 1, 'error' => 'Grupo escolar u horario incompleto'];
+
+                    continue;
+                }
+
+                Horario::updateOrCreate(
+                    [
+                        'grupo_escolar_id' => $grupo->id,
+                        'dia' => (int) $data['dia'],
+                        'hora_inicio' => trim($data['hora_inicio']),
+                        'materia' => trim($data['materia']),
+                    ],
+                    [
+                        'hora_fin' => trim($data['hora_fin']),
+                        'docente' => $data['docente'] ?? null,
+                        'aula' => $data['aula'] ?? null,
+                    ],
+                );
+                $actualizados++;
+
+                continue;
+            }
+
+            if (in_array($importacion->tipo_importacion, ['grupo_escolar', 'matriculas'], true)) {
+                $ciclo = CicloIngreso::where('anio', (int) ($data['ciclo'] ?? 2026))->first() ?? CicloIngreso::vigente();
+                $proceso = ProcesoIngreso::where('ciclo_ingreso_id', $ciclo->id)
+                    ->where(function ($query) use ($data) {
+                        $query->where('folio_examen', trim($data['folio_examen'] ?? ''))
+                            ->orWhereHas('alumno', fn ($q) => $q->where('curp', mb_strtoupper(trim($data['curp'] ?? ''))));
+                    })
+                    ->first();
+
+                if (! $proceso) {
+                    $errores++;
+                    $resumen[] = ['fila' => $total + 1, 'error' => 'Alumno no encontrado en el ciclo indicado'];
+
+                    continue;
+                }
+
+                if ($importacion->tipo_importacion === 'grupo_escolar') {
+                    $grupo = GrupoEscolar::where('ciclo_ingreso_id', $ciclo->id)
+                        ->where('grupo', trim($data['grupo'] ?? ''))
+                        ->first();
+
+                    if (! $grupo) {
+                        $errores++;
+                        $resumen[] = ['fila' => $total + 1, 'error' => 'Grupo escolar no encontrado'];
+
+                        continue;
+                    }
+
+                    $proceso->update(['grupo_escolar_id' => $grupo->id]);
+                    $actualizados++;
+
+                    continue;
+                }
+
+                $matricula = trim($data['matricula'] ?? '');
+                if ($matricula === '' || ProcesoIngreso::where('matricula', $matricula)->whereKeyNot($proceso->id)->exists()) {
+                    $errores++;
+                    $resumen[] = ['fila' => $total + 1, 'error' => 'Matricula vacia o duplicada'];
+
+                    continue;
+                }
+
+                $proceso->update(['matricula' => $matricula]);
                 $actualizados++;
 
                 continue;

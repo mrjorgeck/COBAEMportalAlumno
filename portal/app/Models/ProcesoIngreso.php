@@ -103,6 +103,16 @@ class ProcesoIngreso extends Model
         return $this->belongsTo(GrupoPropedeutico::class, 'grupo_propedeutico_id');
     }
 
+    public function grupoEscolar(): BelongsTo
+    {
+        return $this->belongsTo(GrupoEscolar::class, 'grupo_escolar_id');
+    }
+
+    public function regularizacion(): HasOne
+    {
+        return $this->hasOne(RegularizacionAlumno::class);
+    }
+
     public function hojasRespuesta(): HasMany
     {
         return $this->hasMany(HojaRespuesta::class);

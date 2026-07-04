@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Aviso;
 use App\Models\MaterialRecomendado;
 use App\Models\ProcesoIngreso;
+use App\Models\SicobaemConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -23,14 +24,15 @@ class MiProcesoController extends Controller
                 'Formato' => $proceso->descargasFormato()->exists() ? 'generado' : 'pendiente',
                 'Documentación' => $proceso->estatus_documentacion,
                 'Evaluación' => 'pendiente',
-                'Grupo y matrícula' => $proceso->matricula ? 'publicado' : 'pendiente',
+                'Grupo escolar' => $proceso->grupo_escolar_id ? 'asignado' : 'pendiente',
+                'Matricula' => $proceso->matricula ? 'publicada' : 'pendiente',
             ],
         ]);
     }
 
     public function seccion(Request $request, string $seccion): View|RedirectResponse
     {
-        $sensibles = ['datos', 'documentacion', 'resultados', 'areas-mejora', 'evaluacion-posterior', 'avance', 'materiales'];
+        $sensibles = ['datos', 'documentacion', 'resultados', 'areas-mejora', 'evaluacion-posterior', 'avance', 'materiales', 'grupo-escolar', 'matricula', 'horario', 'sicobaem', 'regularizacion'];
         if (in_array($seccion, $sensibles, true) && ! $request->session()->get('alumno_nivel_sensible', false)) {
             return redirect()->route('alumno.verificacion');
         }
@@ -71,7 +73,19 @@ class MiProcesoController extends Controller
                 ->get();
         }
 
-        return view('alumno.seccion', compact('proceso', 'seccion', 'avisos', 'resultadoInicial', 'resultadoPosterior', 'materiales'));
+        $sicobaemConfig = $seccion === 'sicobaem'
+            ? SicobaemConfig::where('ciclo_ingreso_id', $proceso->ciclo_ingreso_id)->where('activo', true)->first()
+            : null;
+
+        if ($seccion === 'regularizacion') {
+            $proceso->regularizacion()->firstOrCreate([], [
+                'estatus' => 'pendiente',
+                'fecha_asignacion' => now(),
+            ])->update(['fecha_ultima_consulta' => now()]);
+            $proceso->load('regularizacion.ruta');
+        }
+
+        return view('alumno.seccion', compact('proceso', 'seccion', 'avisos', 'resultadoInicial', 'resultadoPosterior', 'materiales', 'sicobaemConfig'));
     }
 
     public function marcarAviso(Request $request, Aviso $aviso): RedirectResponse
@@ -96,6 +110,9 @@ class MiProcesoController extends Controller
             'resultados.areas.area',
             'resultados.areas.nivelRiesgo',
             'grupoPropedeutico',
+            'grupoEscolar.turno',
+            'grupoEscolar.horarios',
+            'regularizacion.ruta',
         ])
             ->findOrFail($request->session()->get('alumno_proceso_id'));
     }
