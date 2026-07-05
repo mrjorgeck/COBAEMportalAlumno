@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ProcesoIngreso;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,9 @@ class UxAcceptanceTest extends TestCase
         $this->get(route('alumno.registro'))
             ->assertOk()
             ->assertSee('Los campos marcados con', false)
+            ->assertSee('Tu avance se guarda en cada paso', false)
+            ->assertSee('https://www.gob.mx/curp/', false)
+            ->assertSee('Guardando...', false)
             ->assertSee('name="curp"', false)
             ->assertSee('aria-required="true"', false)
             ->assertSee('Folio de examen', false);
@@ -68,5 +72,22 @@ class UxAcceptanceTest extends TestCase
                 ->assertDontSee('Stack trace')
                 ->assertDontSee('Exception');
         }
+    }
+
+    public function test_pantalla_de_exito_muestra_folio_y_siguiente_paso(): void
+    {
+        $proceso = ProcesoIngreso::factory()->create([
+            'folio_registro' => 'NI-2026-ARIO-1234',
+        ]);
+
+        $this->withSession([
+            'alumno_proceso_id' => $proceso->id,
+            'alumno_ciclo_id' => $proceso->ciclo_ingreso_id,
+            'alumno_nivel_sensible' => true,
+        ])->get(route('alumno.registro.exito'))
+            ->assertOk()
+            ->assertSee('NI-2026-ARIO-1234')
+            ->assertSee('Descarga e imprime tu formato PDF')
+            ->assertSee('Descargar formato PDF');
     }
 }

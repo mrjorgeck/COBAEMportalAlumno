@@ -3,6 +3,7 @@
     'label',
     'required' => false,
     'help' => null,
+    'helpHtml' => null,
     'error' => null,
     'name' => null,
 ])
@@ -19,8 +20,14 @@
 
     {{ $slot }}
 
-    @if ($help)
-        <p id="{{ $for }}_ayuda" class="text-xs text-gray-600">{{ $help }}</p>
+    @if ($help || $helpHtml)
+        <p id="{{ $for }}_ayuda" class="text-xs text-gray-600">
+            @if ($helpHtml)
+                {!! $helpHtml !!}
+            @else
+                {{ $help }}
+            @endif
+        </p>
     @endif
 
     @if ($errorMessage)

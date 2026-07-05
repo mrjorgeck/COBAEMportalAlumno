@@ -3,7 +3,13 @@
     $select = $input;
     $isRequired = fn (string $field) => in_array($field, $requiredFields, true);
     $id = fn (string $field) => 'form_'.$field;
-    $describedBy = fn (string $field) => $errors->has('form.'.$field) ? $id($field).'_error' : null;
+    $helpFields = ['curp', 'folio_examen'];
+    $describedBy = fn (string $field) => collect([
+        in_array($field, $helpFields, true) ? $id($field).'_ayuda' : null,
+        $errors->has('form.'.$field) ? $id($field).'_error' : null,
+    ])
+        ->filter()
+        ->implode(' ');
 @endphp
 
 <form wire:submit="submit" class="mt-4 space-y-5">
@@ -21,9 +27,17 @@
 
     <x-leyenda-obligatorios />
 
+    <div class="rounded border border-cobaem-100 bg-cobaem-100 p-4 text-sm text-cobaem-900">
+        Tu avance se guarda en cada paso; puedes volver despues con tu CURP.
+    </div>
+
     @if ($step === 1)
         <section class="space-y-4 rounded bg-white p-4 shadow-sm">
-            <x-campo for="{{ $id('curp') }}" label="CURP" :required="$isRequired('curp')" help="Escribe los 18 caracteres de tu CURP en mayusculas.">
+            <x-campo
+                for="{{ $id('curp') }}"
+                label="CURP"
+                :required="$isRequired('curp')"
+                help-html='Escribe los 18 caracteres de tu CURP en mayusculas. <a href="https://www.gob.mx/curp/" target="_blank" rel="noopener noreferrer" class="font-semibold text-cobaem-900 underline">¿No conoces tu CURP? Consultala en gob.mx</a>.'>
                 <input id="{{ $id('curp') }}" name="curp" wire:model="form.curp" maxlength="18" autocomplete="section-curp one-time-code" autocapitalize="characters" autocorrect="off" aria-required="{{ $isRequired('curp') ? 'true' : 'false' }}" @if($describedBy('curp')) aria-describedby="{{ $describedBy('curp') }}" @endif required class="{{ $input }} uppercase">
             </x-campo>
             <x-campo for="{{ $id('folio_examen') }}" label="Folio de examen" :required="$isRequired('folio_examen')" help="Lo encuentras en la hoja de respuestas o comprobante entregado al terminar tu examen.">
@@ -150,17 +164,45 @@
     @endif
 
     @if ($errors->any())
-        <div class="rounded bg-red-50 p-4 text-sm text-red-800">{{ $errors->first() }}</div>
+        <div
+            id="resumen-errores"
+            tabindex="-1"
+            x-data
+            x-init="$nextTick(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'start' }); $el.focus({ preventScroll: true }); })"
+            class="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-800 outline-none focus:ring-2 focus:ring-red-300"
+        >
+            <p class="font-semibold">Revisa estos campos para continuar:</p>
+            <ul class="mt-2 list-disc space-y-1 pl-5">
+                @foreach ($errors->getMessages() as $field => $messages)
+                    @php $target = str_replace('.', '_', $field); @endphp
+                    <li>
+                        <a href="#{{ $target }}" class="underline">{{ $messages[0] }}</a>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     <div class="flex gap-3">
         @if ($step > 1)
-            <button type="button" wire:click="previous" class="min-h-11 w-full rounded bg-gray-200 px-4 py-3 font-semibold">Anterior</button>
+            <button type="button" wire:click="previous" wire:loading.attr="disabled" class="min-h-11 w-full rounded bg-gray-200 px-4 py-3 font-semibold disabled:cursor-not-allowed disabled:opacity-70">Anterior</button>
         @endif
         @if ($step < 6)
-            <button type="button" wire:click="next" class="min-h-11 w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white">Siguiente</button>
+            <button type="button" wire:click="next" wire:loading.attr="disabled" wire:target="next" class="min-h-11 w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70">
+                <span wire:loading.remove wire:target="next">Siguiente</span>
+                <span wire:loading wire:target="next" class="inline-flex items-center justify-center gap-2">
+                    <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                    Revisando...
+                </span>
+            </button>
         @else
-            <button class="min-h-11 w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white">Finalizar registro</button>
+            <button wire:loading.attr="disabled" wire:target="submit" class="min-h-11 w-full rounded bg-cobaem-900 px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70">
+                <span wire:loading.remove wire:target="submit">Finalizar registro</span>
+                <span wire:loading wire:target="submit" class="inline-flex items-center justify-center gap-2">
+                    <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                    Guardando...
+                </span>
+            </button>
         @endif
     </div>
 </form>

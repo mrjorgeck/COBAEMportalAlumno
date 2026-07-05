@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Alumno;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catalogo;
+use App\Models\ProcesoIngreso;
 use App\Services\CurpValidator;
 use App\Services\RegistroAlumnoService;
 use App\Support\RegistroAlumnoRules;
@@ -45,9 +46,11 @@ class RegistroController extends Controller
         return redirect()->route('alumno.registro.exito')->with('mensaje', 'Registro completado. Tu folio interno es '.$proceso->folio_registro.'.');
     }
 
-    public function exito(): View
+    public function exito(Request $request): View
     {
-        return view('alumno.registro-exito');
+        return view('alumno.registro-exito', [
+            'proceso' => ProcesoIngreso::query()->find($request->session()->get('alumno_proceso_id')),
+        ]);
     }
 
     private function catalogos(): array
