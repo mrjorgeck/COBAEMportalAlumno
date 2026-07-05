@@ -15,8 +15,8 @@
         <input name="nombre" class="rounded border-gray-300" placeholder="Grupo, ej. P-03" required>
         <input name="aula" class="rounded border-gray-300" placeholder="Aula">
         <input name="horario_texto" class="rounded border-gray-300" placeholder="Horario">
-        <input type="date" name="fecha_inicio" class="rounded border-gray-300">
-        <input type="date" name="fecha_fin" class="rounded border-gray-300">
+        <input name="fecha_inicio" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" placeholder="Inicio dd/mm/aaaa" class="rounded border-gray-300">
+        <input name="fecha_fin" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" placeholder="Fin dd/mm/aaaa" class="rounded border-gray-300">
         <input name="responsable" class="rounded border-gray-300 md:col-span-3" placeholder="Responsable">
         <textarea name="indicaciones" class="rounded border-gray-300 md:col-span-3" placeholder="Indicaciones"></textarea>
         <textarea name="materiales_requeridos" class="rounded border-gray-300 md:col-span-3" placeholder="Materiales requeridos"></textarea>
@@ -29,6 +29,7 @@
             <article class="rounded bg-white p-4 shadow-sm">
                 <p class="font-semibold">{{ $grupo->nombre }} · {{ $grupo->procesos_count }} alumnos</p>
                 <p class="text-sm text-gray-600">{{ $grupo->horario_texto }} · {{ $grupo->aula }} · {{ $grupo->responsable }}</p>
+                <p class="text-sm text-gray-600">{{ \App\Support\FechaInput::toDisplay($grupo->fecha_inicio) ?: 'Inicio por confirmar' }} - {{ \App\Support\FechaInput::toDisplay($grupo->fecha_fin) ?: 'Fin por confirmar' }}</p>
             </article>
         @endforeach
     </div>

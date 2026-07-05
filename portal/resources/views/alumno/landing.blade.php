@@ -19,7 +19,7 @@
             </div>
 
             <label class="flex min-h-11 items-start gap-2 text-sm text-gray-600" for="recordar_curp">
-                <input type="checkbox" id="recordar_curp" class="mt-1 rounded border-gray-300">
+                <input type="checkbox" id="recordar_curp" name="recordar_curp" class="mt-1 rounded border-gray-300">
                 <span>Recordar mi CURP en este navegador con mi consentimiento.</span>
             </label>
 

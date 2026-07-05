@@ -9,7 +9,7 @@
             @csrf
             <div>
                 <label class="block text-sm font-medium" for="fecha_nacimiento">Fecha de nacimiento</label>
-                <input id="fecha_nacimiento" type="date" name="fecha_nacimiento" autocomplete="bday" class="mt-1 min-h-11 w-full rounded border-gray-300">
+                <input id="fecha_nacimiento" name="fecha_nacimiento" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/aaaa" autocomplete="bday" class="mt-1 min-h-11 w-full rounded border-gray-300">
             </div>
             <div>
                 <label class="block text-sm font-medium" for="folio_examen">O folio de examen</label>

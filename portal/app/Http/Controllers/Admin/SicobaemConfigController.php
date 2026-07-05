@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CicloIngreso;
 use App\Models\SicobaemConfig;
+use App\Support\FechaInput;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -21,6 +22,8 @@ class SicobaemConfigController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        FechaInput::normalizeRequest($request, ['fecha_disponibilidad']);
+
         $data = $request->validate([
             'ciclo_ingreso_id' => ['required', 'exists:ciclos_ingreso,id'],
             'url' => ['nullable', 'url', 'max:255'],

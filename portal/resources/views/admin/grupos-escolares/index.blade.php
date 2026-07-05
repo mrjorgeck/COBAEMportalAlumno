@@ -20,7 +20,7 @@
             @endforeach
         </select>
         <input name="aula_base" placeholder="Aula base" class="rounded border-gray-300">
-        <input name="fecha_inicio_clases" type="date" class="rounded border-gray-300">
+        <input name="fecha_inicio_clases" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" placeholder="Inicio dd/mm/aaaa" class="rounded border-gray-300">
         <textarea name="indicaciones" placeholder="Indicaciones" class="rounded border-gray-300 md:col-span-2"></textarea>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="activo" value="1" checked> Activo</label>
         <button class="rounded bg-cobaem-900 px-4 py-2 text-white md:col-span-4">Guardar grupo</button>
@@ -33,6 +33,7 @@
                     <div>
                         <p class="font-semibold">{{ $grupo->grupo }} - {{ $grupo->ciclo->generacion }}</p>
                         <p class="text-sm text-gray-600">{{ $grupo->turno->nombre }} - {{ $grupo->aula_base ?? 'Aula por confirmar' }} - {{ $grupo->procesos_count }} alumnos</p>
+                        <p class="text-sm text-gray-600">Inicio de clases: {{ \App\Support\FechaInput::toDisplay($grupo->fecha_inicio_clases) ?: 'Por confirmar' }}</p>
                         @if ($grupo->indicaciones)
                             <p class="mt-2 text-sm">{{ $grupo->indicaciones }}</p>
                         @endif

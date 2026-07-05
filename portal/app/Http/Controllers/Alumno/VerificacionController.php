@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Alumno;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProcesoIngreso;
+use App\Support\FechaInput;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,6 +18,8 @@ class VerificacionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        FechaInput::normalizeRequest($request, ['fecha_nacimiento']);
+
         $data = $request->validate([
             'fecha_nacimiento' => ['nullable', 'date'],
             'folio_examen' => ['nullable', 'string', 'max:20'],

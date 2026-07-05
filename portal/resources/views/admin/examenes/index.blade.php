@@ -17,7 +17,7 @@
             <option value="diagnostico_inicial">Diagnostico inicial</option>
             <option value="evaluacion_posterior">Evaluacion posterior</option>
         </select>
-        <input type="date" name="fecha_aplicacion" class="rounded border-gray-300">
+        <input name="fecha_aplicacion" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/aaaa" class="rounded border-gray-300">
         <input name="version" class="rounded border-gray-300" placeholder="Version">
         <input type="number" name="total_preguntas" class="rounded border-gray-300" placeholder="Preguntas" min="1" required>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="activo" value="1" checked> Activo</label>
@@ -36,7 +36,7 @@
                         <option value="diagnostico_inicial" @selected($examen->tipo === 'diagnostico_inicial')>Diagnostico</option>
                         <option value="evaluacion_posterior" @selected($examen->tipo === 'evaluacion_posterior')>Posterior</option>
                     </select>
-                    <input type="date" name="fecha_aplicacion" value="{{ $examen->fecha_aplicacion?->toDateString() }}" class="rounded border-gray-300">
+                    <input name="fecha_aplicacion" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/aaaa" value="{{ \App\Support\FechaInput::toDisplay($examen->fecha_aplicacion) }}" class="rounded border-gray-300">
                     <input name="version" value="{{ $examen->version }}" class="rounded border-gray-300">
                     <input type="number" name="total_preguntas" value="{{ $examen->total_preguntas }}" class="rounded border-gray-300">
                     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="activo" value="1" @checked($examen->activo)> Activo</label>

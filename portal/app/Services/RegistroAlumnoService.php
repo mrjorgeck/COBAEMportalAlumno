@@ -110,20 +110,18 @@ class RegistroAlumnoService
                 ],
             );
 
-            if (! empty($data['madre_nombres'])) {
-                Familiar::updateOrCreate(
-                    ['proceso_ingreso_id' => $proceso->id, 'tipo_familiar' => 'madre'],
-                    [
-                        'nombres' => $data['madre_nombres'],
-                        'primer_apellido' => $data['madre_primer_apellido'] ?? '',
-                        'segundo_apellido' => $data['madre_segundo_apellido'] ?? null,
-                        'telefono' => $data['madre_telefono'] ?? null,
-                        'celular' => $data['madre_celular'] ?? null,
-                        'ocupacion_id' => $data['madre_ocupacion_id'] ?? null,
-                        'estudios_id' => $data['madre_estudios_id'] ?? null,
-                    ],
-                );
-            }
+            Familiar::updateOrCreate(
+                ['proceso_ingreso_id' => $proceso->id, 'tipo_familiar' => 'madre'],
+                [
+                    'nombres' => $data['madre_nombres'],
+                    'primer_apellido' => $data['madre_primer_apellido'],
+                    'segundo_apellido' => $data['madre_segundo_apellido'],
+                    'telefono' => $data['madre_telefono'],
+                    'celular' => $data['madre_celular'],
+                    'ocupacion_id' => $data['madre_ocupacion_id'],
+                    'estudios_id' => $data['madre_estudios_id'],
+                ],
+            );
 
             OtrosDatosAlumno::updateOrCreate(
                 ['proceso_ingreso_id' => $proceso->id],

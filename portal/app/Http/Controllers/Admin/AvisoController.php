@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Aviso;
 use App\Models\Catalogo;
 use App\Models\CicloIngreso;
+use App\Support\FechaInput;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -59,6 +60,8 @@ class AvisoController extends Controller
 
     private function validated(Request $request): array
     {
+        FechaInput::normalizeRequest($request, ['fecha_inicio', 'fecha_fin']);
+
         return $request->validate([
             'titulo' => ['required', 'string', 'max:255'],
             'mensaje' => ['required', 'string'],

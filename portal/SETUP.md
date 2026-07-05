@@ -3,6 +3,18 @@
 El esqueleto del proyecto ya está completo en esta carpeta. Falta instalar
 dependencias (requiere PHP 8.3, Composer y Node 20+ en tu máquina).
 
+## PHP 8.3 en Windows (entorno de desarrollo de este proyecto)
+
+PHP 8.3.32 NTS x64 instalado desde el ZIP oficial de windows.php.net en:
+`C:\Users\sentu\AppData\Local\Programs\PHP\8.3.32` (al inicio del PATH de
+usuario). Extensiones habilitadas en `php.ini`: `pdo_sqlite`, `sqlite3`,
+`mbstring`, `fileinfo`, `openssl`, `curl`, `gd`, `zip`.
+
+Importante: las terminales/sesiones de agentes (Codex) abiertas ANTES del
+cambio de PATH siguen resolviendo el PHP viejo — reiniciar la terminal o el
+agente tras cambiar el PATH. Verificar siempre con `php -v` (debe ser 8.3.x)
+antes de correr tests.
+
 ## 1. Instalar dependencias
 
 ```bash

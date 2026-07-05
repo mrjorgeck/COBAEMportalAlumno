@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Catalogo;
 use App\Services\CurpValidator;
 use App\Services\RegistroAlumnoService;
+use App\Support\FechaInput;
 use App\Support\RegistroAlumnoRules;
 use Illuminate\Support\Arr;
 use Livewire\Component;
@@ -20,6 +21,7 @@ class RegistroWizard extends Component
     public function mount(?string $curp = null): void
     {
         $this->form = array_replace($this->form, session('registro_borrador', []));
+        $this->splitFechaNacimiento();
 
         if ($curp && empty($this->form['curp'])) {
             $this->form['curp'] = $curp;
@@ -28,7 +30,9 @@ class RegistroWizard extends Component
 
     public function next(): void
     {
+        $this->normalizeStepDates();
         $this->validate($this->stepRules());
+        $this->displayStepDates();
         $this->saveDraft();
         $this->step = min(6, $this->step + 1);
     }
@@ -41,6 +45,7 @@ class RegistroWizard extends Component
 
     public function submit(CurpValidator $curpValidator, RegistroAlumnoService $service)
     {
+        $this->normalizeStepDates();
         $data = $this->validate($this->prefixedRules())['form'];
         $data['curp'] = mb_strtoupper($data['curp']);
 
@@ -73,12 +78,62 @@ class RegistroWizard extends Component
         return view('livewire.registro-wizard', [
             'catalogos' => $this->catalogos(),
             'requiredFields' => $this->requiredFields(),
+            'diasNacimiento' => range(1, 31),
+            'mesesNacimiento' => range(1, 12),
+            'aniosNacimiento' => range((int) now()->subYears(10)->format('Y'), (int) now()->subYears(80)->format('Y')),
         ]);
     }
 
     private function saveDraft(): void
     {
         session(['registro_borrador' => $this->form]);
+    }
+
+    private function normalizeStepDates(): void
+    {
+        $this->composeFechaNacimiento();
+
+        if (array_key_exists('fecha_nacimiento', $this->form)) {
+            $this->form['fecha_nacimiento'] = FechaInput::toDatabase($this->form['fecha_nacimiento']);
+        }
+    }
+
+    private function displayStepDates(): void
+    {
+        if (array_key_exists('fecha_nacimiento', $this->form)) {
+            $this->form['fecha_nacimiento'] = FechaInput::toDisplay($this->form['fecha_nacimiento']);
+            $this->splitFechaNacimiento();
+        }
+    }
+
+    private function composeFechaNacimiento(): void
+    {
+        $dia = $this->form['fecha_nacimiento_dia'] ?? null;
+        $mes = $this->form['fecha_nacimiento_mes'] ?? null;
+        $anio = $this->form['fecha_nacimiento_anio'] ?? null;
+
+        if ($dia && $mes && $anio) {
+            $this->form['fecha_nacimiento'] = sprintf('%02d/%02d/%04d', (int) $dia, (int) $mes, (int) $anio);
+        }
+    }
+
+    private function splitFechaNacimiento(): void
+    {
+        $fecha = $this->form['fecha_nacimiento'] ?? null;
+
+        if (! is_string($fecha) || $fecha === '') {
+            return;
+        }
+
+        $display = FechaInput::toDisplay($fecha);
+
+        if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $display, $matches) !== 1) {
+            return;
+        }
+
+        $this->form['fecha_nacimiento_dia'] = (int) $matches[1];
+        $this->form['fecha_nacimiento_mes'] = (int) $matches[2];
+        $this->form['fecha_nacimiento_anio'] = (int) $matches[3];
     }
 
     private function stepRules(): array

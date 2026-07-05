@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CicloIngreso;
 use App\Models\GrupoPropedeutico;
 use App\Models\ProcesoIngreso;
+use App\Support\FechaInput;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -51,6 +52,8 @@ class GrupoPropedeuticoController extends Controller
 
     private function validated(Request $request): array
     {
+        FechaInput::normalizeRequest($request, ['fecha_inicio', 'fecha_fin']);
+
         return $request->validate([
             'ciclo_ingreso_id' => ['required', 'exists:ciclos_ingreso,id'],
             'nombre' => ['required', 'string', 'max:50'],

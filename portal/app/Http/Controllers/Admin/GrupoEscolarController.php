@@ -8,6 +8,7 @@ use App\Models\CicloIngreso;
 use App\Models\GrupoEscolar;
 use App\Models\Horario;
 use App\Models\ProcesoIngreso;
+use App\Support\FechaInput;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -94,6 +95,8 @@ class GrupoEscolarController extends Controller
 
     private function validated(Request $request): array
     {
+        FechaInput::normalizeRequest($request, ['fecha_inicio_clases']);
+
         return $request->validate([
             'ciclo_ingreso_id' => ['required', 'exists:ciclos_ingreso,id'],
             'grupo' => ['required', 'string', 'max:50'],
