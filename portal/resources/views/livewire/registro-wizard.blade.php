@@ -4,8 +4,10 @@
     $isRequired = fn (string $field) => in_array($field, $requiredFields, true);
     $id = fn (string $field) => 'form_'.$field;
     $helpFields = ['curp', 'folio_examen'];
+    $counterFields = ['curp'];
     $describedBy = fn (string $field) => collect([
         in_array($field, $helpFields, true) ? $id($field).'_ayuda' : null,
+        in_array($field, $counterFields, true) ? $id($field).'_contador' : null,
         $errors->has('form.'.$field) ? $id($field).'_error' : null,
     ])
         ->filter()
@@ -40,7 +42,12 @@
                 help="Escribe los 18 caracteres de tu CURP en mayusculas."
                 help-href="https://www.gob.mx/curp/"
                 help-link="¿No conoces tu CURP? Consultala en gob.mx">
-                <input id="{{ $id('curp') }}" name="curp" wire:model="form.curp" maxlength="18" autocomplete="section-curp one-time-code" autocapitalize="characters" autocorrect="off" aria-required="{{ $isRequired('curp') ? 'true' : 'false' }}" @if($describedBy('curp')) aria-describedby="{{ $describedBy('curp') }}" @endif required class="{{ $input }} uppercase">
+                <div x-data="{ curpLength: 0 }" x-init="curpLength = $refs.curp.value.length">
+                    <input id="{{ $id('curp') }}" x-ref="curp" x-on:input="curpLength = $event.target.value.length" name="curp" wire:model="form.curp" maxlength="18" autocomplete="section-curp one-time-code" autocapitalize="characters" autocorrect="off" aria-required="{{ $isRequired('curp') ? 'true' : 'false' }}" @if($describedBy('curp')) aria-describedby="{{ $describedBy('curp') }}" @endif required class="{{ $input }} uppercase">
+                    <p id="{{ $id('curp') }}_contador" class="mt-1 text-xs text-gray-600">
+                        <span x-text="curpLength"></span>/18 caracteres
+                    </p>
+                </div>
             </x-campo>
             <x-campo for="{{ $id('folio_examen') }}" label="Folio de examen" :required="$isRequired('folio_examen')" help="Lo encuentras en la hoja de respuestas o comprobante entregado al terminar tu examen.">
                 <input id="{{ $id('folio_examen') }}" name="folio_examen" wire:model="form.folio_examen" autocomplete="section-folio one-time-code" aria-required="{{ $isRequired('folio_examen') ? 'true' : 'false' }}" @if($describedBy('folio_examen')) aria-describedby="{{ $describedBy('folio_examen') }}" @endif required class="{{ $input }}">
@@ -83,10 +90,14 @@
     @elseif ($step === 3)
         <section class="space-y-4 rounded bg-white p-4 shadow-sm">
             <x-campo for="{{ $id('municipio_id') }}" label="Municipio" :required="$isRequired('municipio_id')">
-                <select id="{{ $id('municipio_id') }}" name="municipio_id" wire:model="form.municipio_id" aria-required="{{ $isRequired('municipio_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                <x-select-buscable label="Buscar municipio" placeholder="Buscar municipio">
+                    <select id="{{ $id('municipio_id') }}" name="municipio_id" wire:model="form.municipio_id" aria-required="{{ $isRequired('municipio_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                </x-select-buscable>
             </x-campo>
             <x-campo for="{{ $id('localidad_id') }}" label="Localidad" :required="$isRequired('localidad_id')">
-                <select id="{{ $id('localidad_id') }}" name="localidad_id" wire:model="form.localidad_id" aria-required="{{ $isRequired('localidad_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['localidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                <x-select-buscable label="Buscar localidad" placeholder="Buscar localidad">
+                    <select id="{{ $id('localidad_id') }}" name="localidad_id" wire:model="form.localidad_id" aria-required="{{ $isRequired('localidad_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['localidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                </x-select-buscable>
             </x-campo>
             <x-campo for="{{ $id('domicilio') }}" label="Domicilio" :required="$isRequired('domicilio')">
                 <input id="{{ $id('domicilio') }}" name="domicilio" autocomplete="section-alumno street-address" wire:model="form.domicilio" aria-required="{{ $isRequired('domicilio') ? 'true' : 'false' }}" required class="{{ $input }}">
@@ -110,10 +121,14 @@
     @elseif ($step === 4)
         <section class="space-y-4 rounded bg-white p-4 shadow-sm">
             <x-campo for="{{ $id('entidad_secundaria_id') }}" label="Entidad" :required="$isRequired('entidad_secundaria_id')">
-                <select id="{{ $id('entidad_secundaria_id') }}" name="entidad_secundaria_id" wire:model="form.entidad_secundaria_id" aria-required="{{ $isRequired('entidad_secundaria_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['entidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                <x-select-buscable label="Buscar entidad de secundaria" placeholder="Buscar entidad">
+                    <select id="{{ $id('entidad_secundaria_id') }}" name="entidad_secundaria_id" wire:model="form.entidad_secundaria_id" aria-required="{{ $isRequired('entidad_secundaria_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['entidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                </x-select-buscable>
             </x-campo>
             <x-campo for="{{ $id('municipio_secundaria_id') }}" label="Municipio" :required="$isRequired('municipio_secundaria_id')">
-                <select id="{{ $id('municipio_secundaria_id') }}" name="municipio_secundaria_id" wire:model="form.municipio_secundaria_id" aria-required="{{ $isRequired('municipio_secundaria_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                <x-select-buscable label="Buscar municipio de secundaria" placeholder="Buscar municipio">
+                    <select id="{{ $id('municipio_secundaria_id') }}" name="municipio_secundaria_id" wire:model="form.municipio_secundaria_id" aria-required="{{ $isRequired('municipio_secundaria_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
+                </x-select-buscable>
             </x-campo>
             <x-campo for="{{ $id('secundaria_nombre') }}" label="Nombre de la escuela" :required="$isRequired('secundaria_nombre')">
                 <input id="{{ $id('secundaria_nombre') }}" name="secundaria_nombre" wire:model="form.secundaria_nombre" aria-required="{{ $isRequired('secundaria_nombre') ? 'true' : 'false' }}" required class="{{ $input }}">
