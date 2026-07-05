@@ -3,7 +3,8 @@
     'label',
     'required' => false,
     'help' => null,
-    'helpHtml' => null,
+    'helpHref' => null,
+    'helpLink' => null,
     'error' => null,
     'name' => null,
 ])
@@ -20,12 +21,13 @@
 
     {{ $slot }}
 
-    @if ($help || $helpHtml)
+    @if ($help || $helpHref)
         <p id="{{ $for }}_ayuda" class="text-xs text-gray-600">
-            @if ($helpHtml)
-                {!! $helpHtml !!}
-            @else
+            @if ($help)
                 {{ $help }}
+            @endif
+            @if ($helpHref)
+                <a href="{{ $helpHref }}" target="_blank" rel="noopener noreferrer" class="font-semibold text-cobaem-900 underline">{{ $helpLink }}</a>.
             @endif
         </p>
     @endif

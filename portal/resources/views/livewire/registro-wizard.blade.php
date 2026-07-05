@@ -37,7 +37,9 @@
                 for="{{ $id('curp') }}"
                 label="CURP"
                 :required="$isRequired('curp')"
-                help-html='Escribe los 18 caracteres de tu CURP en mayusculas. <a href="https://www.gob.mx/curp/" target="_blank" rel="noopener noreferrer" class="font-semibold text-cobaem-900 underline">¿No conoces tu CURP? Consultala en gob.mx</a>.'>
+                help="Escribe los 18 caracteres de tu CURP en mayusculas."
+                help-href="https://www.gob.mx/curp/"
+                help-link="¿No conoces tu CURP? Consultala en gob.mx">
                 <input id="{{ $id('curp') }}" name="curp" wire:model="form.curp" maxlength="18" autocomplete="section-curp one-time-code" autocapitalize="characters" autocorrect="off" aria-required="{{ $isRequired('curp') ? 'true' : 'false' }}" @if($describedBy('curp')) aria-describedby="{{ $describedBy('curp') }}" @endif required class="{{ $input }} uppercase">
             </x-campo>
             <x-campo for="{{ $id('folio_examen') }}" label="Folio de examen" :required="$isRequired('folio_examen')" help="Lo encuentras en la hoja de respuestas o comprobante entregado al terminar tu examen.">
