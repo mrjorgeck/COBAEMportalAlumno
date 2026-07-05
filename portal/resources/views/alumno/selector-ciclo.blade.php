@@ -7,11 +7,11 @@
     <form method="POST" action="{{ route('alumno.seleccionar-ciclo') }}" class="mt-4 space-y-3">
         @csrf
         @foreach ($procesos as $proceso)
-            <label class="block rounded bg-white p-4 shadow">
-                <input type="radio" name="proceso_id" value="{{ $proceso->id }}" required>
-                {{ $proceso->ciclo->generacion }} - {{ $proceso->folio_registro }}
+            <label class="flex min-h-11 items-center gap-2 rounded bg-white p-4 shadow" for="proceso_{{ $proceso->id }}">
+                <input id="proceso_{{ $proceso->id }}" type="radio" name="proceso_id" value="{{ $proceso->id }}" required>
+                <span>{{ $proceso->ciclo->generacion }} - {{ $proceso->folio_registro }}</span>
             </label>
         @endforeach
-        <button class="w-full rounded bg-cobaem-900 px-4 py-2 font-semibold text-white">Continuar</button>
+        <button class="min-h-11 w-full rounded bg-cobaem-900 px-4 py-2 font-semibold text-white">Continuar</button>
     </form>
 @endsection

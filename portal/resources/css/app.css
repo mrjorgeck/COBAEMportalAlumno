@@ -12,3 +12,10 @@
     --color-cobaem-100: #e8f0f9;
     --color-dorado-500: #c9a227;
 }
+
+@layer base {
+    :focus-visible {
+        outline: 3px solid var(--color-dorado-500);
+        outline-offset: 2px;
+    }
+}

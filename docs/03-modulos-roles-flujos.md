@@ -107,3 +107,11 @@ Total registrados, completos vs incompletos, sin folio de examen, folios duplica
 Indicadores §24.2 con filtros por ciclo, examen, área, secundaria de procedencia, grupo. Vistas por rol (§24.3). Gráficas: barras por área, distribución de riesgo (dona), dispersión promedio secundaria vs resultado, top preguntas falladas, comparativo evaluación 1 vs 2 por grupo.
 
 Implementación: consultas agregadas con caché de 10 min (driver database/file); sin herramientas BI externas.
+## 8. Convenciones UX del portal
+
+- Formularios: usar componentes Blade reutilizables (`x-campo`, `x-obligatorio`, `x-leyenda-obligatorios`) para label, ayuda, error inline y marcado visual de campos obligatorios. En el wizard de registro, la obligatoriedad visible se deriva de `RegistroAlumnoRules`.
+- Campos y accesibilidad: cada control debe tener `id` y label asociado con `for`; los controles tactiles del alumno deben medir al menos 44 px de alto. Usar `type`, `inputmode` y `autocomplete` adecuados para movil.
+- Validacion: los mensajes deben estar en espanol, con nombres humanos de atributos en `lang/es/validation.php`, sin revelar si una CURP existe o no.
+- Errores HTTP: las vistas `403`, `404`, `419`, `429`, `500` y `503` viven en `resources/views/errors/`, usan lenguaje simple y nunca muestran detalles tecnicos al usuario final.
+- Retroalimentacion: los banners de exito usan `x-flash`, con cierre manual y autocierre. Las acciones destructivas o de alto impacto en admin deben pedir confirmacion con una frase que explique la consecuencia.
+- Seguimiento del alumno: "Mi proceso" debe mostrar cada etapa con estado visual, texto de siguiente paso y acceso a las secciones publicadas por ciclo.
