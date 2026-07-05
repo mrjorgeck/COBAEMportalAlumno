@@ -27,7 +27,7 @@
     </form>
 
     <div class="mt-4 space-y-4">
-        @foreach ($grupos as $grupo)
+        @forelse ($grupos as $grupo)
             <article class="rounded bg-white p-4 shadow-sm">
                 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
@@ -37,7 +37,7 @@
                             <p class="mt-2 text-sm">{{ $grupo->indicaciones }}</p>
                         @endif
                     </div>
-                    <form method="POST" action="{{ route('admin.grupos-escolares.destroy', $grupo) }}">
+                    <form method="POST" action="{{ route('admin.grupos-escolares.destroy', $grupo) }}" onsubmit="return confirm('Eliminar este grupo quitara su horario y asignaciones visibles. ¿Deseas continuar?')">
                         @csrf @method('DELETE')
                         <button class="rounded bg-gray-200 px-3 py-1 text-sm">Eliminar</button>
                     </form>
@@ -70,7 +70,7 @@
                                     <td>{{ $horario->docente ?? 'Por confirmar' }}</td>
                                     <td>{{ $horario->aula ?? $grupo->aula_base }}</td>
                                     <td>
-                                        <form method="POST" action="{{ route('admin.horarios.destroy', $horario) }}">
+                                        <form method="POST" action="{{ route('admin.horarios.destroy', $horario) }}" onsubmit="return confirm('Esta clase se quitara del horario publicado. ¿Deseas eliminarla?')">
                                             @csrf @method('DELETE')
                                             <button class="text-cobaem-900">Eliminar</button>
                                         </form>
@@ -83,7 +83,9 @@
                     </table>
                 </div>
             </article>
-        @endforeach
+        @empty
+            <p class="rounded bg-white p-4 text-sm text-gray-600 shadow-sm">Aun no hay grupos escolares registrados.</p>
+        @endforelse
     </div>
 
     <div class="mt-4">{{ $grupos->links() }}</div>

@@ -12,7 +12,7 @@
         <table class="w-full text-sm">
             <thead><tr class="bg-gray-100 text-left"><th class="p-2">Alumno</th><th>CURP</th><th>Folio</th><th>Estatus</th><th></th></tr></thead>
             <tbody>
-            @foreach ($procesos as $proceso)
+            @forelse ($procesos as $proceso)
                 <tr class="border-t">
                     <td class="p-2">{{ $proceso->alumno->nombre_completo }}</td>
                     <td>{{ $proceso->alumno->curp }}</td>
@@ -20,7 +20,11 @@
                     <td>{{ $proceso->estatus_proceso }}</td>
                     <td><a class="font-semibold text-cobaem-900" href="{{ route('admin.alumnos.show', $proceso) }}">Ver</a></td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="5" class="p-4 text-sm text-gray-600">Aun no hay alumnos con ese criterio de busqueda.</td>
+                </tr>
+            @endforelse
             </tbody>
         </table>
     </div>

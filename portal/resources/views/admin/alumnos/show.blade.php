@@ -55,7 +55,7 @@
                     <button class="mt-2 rounded bg-gray-800 px-3 py-1 text-white">Guardar matricula</button>
                 </form>
             @endcan
-            <form method="POST" action="{{ route('admin.alumnos.bloquear', $proceso) }}" class="mt-3">
+            <form method="POST" action="{{ route('admin.alumnos.bloquear', $proceso) }}" class="mt-3" onsubmit="return confirm('Esto cambiara si el alumno puede editar sus datos. La consulta de informacion seguira disponible. ¿Deseas continuar?')">
                 @csrf
                 <button class="rounded bg-cobaem-900 px-4 py-2 text-white">{{ $proceso->edicion_bloqueada ? 'Desbloquear edicion' : 'Bloquear edicion' }}</button>
             </form>

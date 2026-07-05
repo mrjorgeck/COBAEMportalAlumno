@@ -9,7 +9,7 @@
         <input name="generacion" placeholder="Nuevo ingreso 2027" class="rounded border-gray-300">
         <button class="rounded bg-gray-800 px-4 py-2 text-white">Crear ciclo</button>
     </form>
-    <form method="POST" action="{{ route('admin.modulos.store') }}" class="mt-4 rounded bg-white p-4 shadow-sm">
+    <form method="POST" action="{{ route('admin.modulos.store') }}" class="mt-4 rounded bg-white p-4 shadow-sm" onsubmit="return confirm('Esto cambia las secciones visibles para los alumnos del ciclo seleccionado. ¿Deseas publicar estos modulos?')">
         @csrf
         <select name="ciclo_ingreso_id" class="rounded border-gray-300">
             @foreach ($ciclos as $ciclo)<option value="{{ $ciclo->id }}">{{ $ciclo->generacion }}</option>@endforeach

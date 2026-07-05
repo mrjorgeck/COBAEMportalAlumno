@@ -70,9 +70,7 @@
         </header>
 
         <main class="flex-1 p-4 md:p-6">
-            @if (session('mensaje'))
-                <div class="mb-4 rounded bg-cobaem-100 px-4 py-3 text-sm text-cobaem-900">{{ session('mensaje') }}</div>
-            @endif
+            <x-flash :message="session('mensaje')" />
             @yield('contenido')
         </main>
     </div>

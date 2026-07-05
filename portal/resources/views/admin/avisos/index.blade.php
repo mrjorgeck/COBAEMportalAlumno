@@ -6,15 +6,17 @@
         <a class="rounded bg-cobaem-900 px-4 py-2 text-white" href="{{ route('admin.avisos.create') }}">Nuevo aviso</a>
     </div>
     <div class="mt-4 space-y-3">
-        @foreach ($avisos as $aviso)
+        @forelse ($avisos as $aviso)
             <article class="rounded bg-white p-4 shadow-sm">
                 <p class="font-semibold">{{ $aviso->titulo }}</p>
                 <p class="text-sm text-gray-600">{{ $aviso->prioridad }} - {{ $aviso->dirigido_a }}</p>
                 <div class="mt-3 flex gap-3 text-sm">
                     <a class="font-semibold text-cobaem-900" href="{{ route('admin.avisos.edit', $aviso) }}">Editar</a>
-                    <form method="POST" action="{{ route('admin.avisos.destroy', $aviso) }}">@csrf @method('DELETE')<button>Eliminar</button></form>
+                    <form method="POST" action="{{ route('admin.avisos.destroy', $aviso) }}" onsubmit="return confirm('Este aviso dejara de mostrarse a los alumnos. ¿Deseas eliminarlo?')">@csrf @method('DELETE')<button>Eliminar</button></form>
                 </div>
             </article>
-        @endforeach
+        @empty
+            <p class="rounded bg-white p-4 text-sm text-gray-600 shadow-sm">Aun no hay avisos publicados.</p>
+        @endforelse
     </div>
 @endsection

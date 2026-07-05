@@ -8,9 +8,31 @@
 
     <div class="mt-4 space-y-3">
         @foreach ($etapas as $etapa => $estado)
-            <div class="rounded bg-white p-4 shadow-sm">
-                <p class="font-semibold">{{ $etapa }}</p>
-                <p class="text-sm text-gray-600">{{ $estado }}</p>
+            @php
+                $estadoNormalizado = str($estado)->lower()->replace('_', ' ')->toString();
+                $completo = in_array($estado, ['registrado', 'validado', 'generado', 'asignado', 'publicada'], true);
+                $alerta = in_array($estado, ['requiere_correccion', 'rechazado'], true);
+                $color = $completo ? 'bg-green-50 text-green-800 border-green-200' : ($alerta ? 'bg-yellow-50 text-yellow-900 border-yellow-200' : 'bg-gray-50 text-gray-700 border-gray-200');
+                $icono = $completo ? '✓' : ($alerta ? '!' : '…');
+                $siguiente = match (true) {
+                    $etapa === 'Registro' => $completo ? 'Tu registro fue recibido. Conserva tu folio para cualquier aclaracion.' : 'Completa los datos pendientes para continuar.',
+                    $etapa === 'Formato' => $completo ? 'Tu formato ya fue generado. Puedes descargarlo cuando lo necesites.' : 'Descarga e imprime tu formato PDF para entregarlo en el plantel.',
+                    str_contains($etapa, 'Document') => $completo ? 'Tu documentacion esta validada.' : ($alerta ? 'Revisa las observaciones de control escolar y corrige lo solicitado.' : 'Tu documentacion esta en revision; te avisaremos aqui.'),
+                    str_contains($etapa, 'Evalu') => 'Cuando se publiquen resultados, los veras en esta seccion.',
+                    $etapa === 'Grupo escolar' => $completo ? 'Tu grupo ya esta asignado. Revisa tambien tu horario.' : 'El plantel publicara tu grupo cuando este listo.',
+                    $etapa === 'Matricula' => $completo ? 'Tu matricula ya esta publicada.' : 'La matricula se publicara cuando el plantel la confirme.',
+                    default => 'Revisa esta etapa para conocer el siguiente paso.',
+                };
+            @endphp
+            <div class="rounded border bg-white p-4 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-bold {{ $color }}" aria-hidden="true">{{ $icono }}</span>
+                    <div>
+                        <p class="font-semibold">{{ $etapa }}</p>
+                        <p class="text-sm font-medium text-gray-700">{{ ucfirst($estadoNormalizado) }}</p>
+                        <p class="mt-1 text-sm text-gray-600">{{ $siguiente }}</p>
+                    </div>
+                </div>
             </div>
         @endforeach
     </div>

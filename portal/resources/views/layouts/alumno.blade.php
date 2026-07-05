@@ -25,11 +25,7 @@
     </header>
 
     <main class="mx-auto max-w-lg px-4 py-6">
-        @if (session('mensaje'))
-            <div class="mb-4 rounded-lg bg-cobaem-100 px-4 py-3 text-sm text-cobaem-900">
-                {{ session('mensaje') }}
-            </div>
-        @endif
+        <x-flash :message="session('mensaje')" />
 
         @yield('contenido')
     </main>

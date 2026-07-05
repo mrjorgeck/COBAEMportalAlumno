@@ -25,7 +25,7 @@
     </form>
 
     <div class="mt-4 space-y-3">
-        @foreach ($examenes as $examen)
+        @forelse ($examenes as $examen)
             <article class="rounded bg-white p-4 shadow-sm">
                 <form method="POST" action="{{ route('admin.examenes.update', $examen) }}" class="grid gap-3 md:grid-cols-6">
                     @csrf
@@ -42,14 +42,16 @@
                     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="activo" value="1" @checked($examen->activo)> Activo</label>
                     <button class="rounded bg-gray-800 px-3 py-2 text-sm text-white">Actualizar</button>
                 </form>
-                <form method="POST" action="{{ route('admin.examenes.destroy', $examen) }}" class="mt-2">
+                <form method="POST" action="{{ route('admin.examenes.destroy', $examen) }}" class="mt-2" onsubmit="return confirm('Eliminar este examen puede afectar cargas o consultas asociadas. ¿Deseas continuar?')">
                     @csrf
                     @method('DELETE')
                     <button class="text-sm font-semibold text-red-700">Eliminar</button>
                 </form>
                 <p class="mt-2 text-xs text-gray-500">ID para CSV: {{ $examen->id }} · {{ $examen->ciclo->generacion }}</p>
             </article>
-        @endforeach
+        @empty
+            <p class="rounded bg-white p-4 text-sm text-gray-600 shadow-sm">Aun no hay examenes configurados.</p>
+        @endforelse
     </div>
 
     <div class="mt-4">{{ $examenes->links() }}</div>
