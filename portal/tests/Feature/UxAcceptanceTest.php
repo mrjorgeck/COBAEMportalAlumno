@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class UxAcceptanceTest extends TestCase
@@ -42,5 +43,30 @@ class UxAcceptanceTest extends TestCase
             ->assertSessionHasErrors([
                 'curp' => 'Revisa tu CURP: debe tener 18 caracteres y coincidir con el formato oficial.',
             ]);
+    }
+
+    public function test_paginas_de_error_personalizadas_responden_con_status_y_texto_amable(): void
+    {
+        config(['app.debug' => false]);
+
+        Route::get('/__ux-error/{code}', fn (string $code) => abort((int) $code))
+            ->whereNumber('code');
+
+        $casos = [
+            403 => 'No tienes permiso para ver esta sección',
+            404 => 'No encontramos esta página',
+            419 => 'Tu sesión expiró',
+            429 => 'Demasiados intentos',
+            500 => 'Algo salió mal de nuestro lado',
+            503 => 'Portal en mantenimiento',
+        ];
+
+        foreach ($casos as $codigo => $texto) {
+            $this->get('/__ux-error/'.$codigo)
+                ->assertStatus($codigo)
+                ->assertSee($texto)
+                ->assertDontSee('Stack trace')
+                ->assertDontSee('Exception');
+        }
     }
 }
