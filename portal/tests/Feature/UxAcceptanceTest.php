@@ -26,4 +26,21 @@ class UxAcceptanceTest extends TestCase
             ->assertSee('aria-required="true"', false)
             ->assertSee('Folio de examen', false);
     }
+
+    public function test_mensajes_de_validacion_salen_en_espanol_con_atributos_humanos(): void
+    {
+        $this->post(route('admin.login.store'), [])
+            ->assertSessionHasErrors([
+                'email' => 'El campo correo electrónico es obligatorio.',
+                'password' => 'El campo contraseña es obligatorio.',
+            ]);
+    }
+
+    public function test_mensaje_de_curp_invalida_es_amable_y_accionable(): void
+    {
+        $this->post(route('alumno.acceso'), ['curp' => 'AAAAAAAAAAAAAAAAAA'])
+            ->assertSessionHasErrors([
+                'curp' => 'Revisa tu CURP: debe tener 18 caracteres y coincidir con el formato oficial.',
+            ]);
+    }
 }

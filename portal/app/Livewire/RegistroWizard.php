@@ -45,13 +45,13 @@ class RegistroWizard extends Component
         $data['curp'] = mb_strtoupper($data['curp']);
 
         if (! $curpValidator->esValida($data['curp'])) {
-            $this->addError('form.curp', 'La CURP no tiene un formato válido.');
+            $this->addError('form.curp', 'Revisa tu CURP: debe tener 18 caracteres y coincidir con el formato oficial.');
 
             return null;
         }
 
         if ($data['folio_examen'] !== $data['folio_examen_confirmacion']) {
-            $this->addError('form.folio_examen_confirmacion', 'La confirmación del folio de examen no coincide.');
+            $this->addError('form.folio_examen_confirmacion', 'Los folios no coinciden. Escríbelo igual que aparece en tu hoja de respuestas.');
 
             return null;
         }

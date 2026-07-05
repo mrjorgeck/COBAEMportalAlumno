@@ -27,11 +27,11 @@ class RegistroController extends Controller
         $data['curp'] = mb_strtoupper($data['curp']);
 
         if (! $curpValidator->esValida($data['curp'])) {
-            return back()->withErrors(['curp' => 'La CURP no tiene un formato válido.'])->withInput();
+            return back()->withErrors(['curp' => 'Revisa tu CURP: debe tener 18 caracteres y coincidir con el formato oficial.'])->withInput();
         }
 
         if ($data['folio_examen'] !== $data['folio_examen_confirmacion']) {
-            return back()->withErrors(['folio_examen_confirmacion' => 'La confirmación del folio de examen no coincide.'])->withInput();
+            return back()->withErrors(['folio_examen_confirmacion' => 'Los folios no coinciden. Escríbelo igual que aparece en tu hoja de respuestas.'])->withInput();
         }
 
         $proceso = $service->registrar($data);

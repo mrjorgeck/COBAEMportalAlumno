@@ -19,7 +19,7 @@ class AccesoController extends Controller
         $curp = mb_strtoupper($data['curp']);
 
         if (! $validator->esValida($curp)) {
-            return back()->withErrors(['curp' => 'La CURP no tiene un formato válido.'])->withInput();
+            return back()->withErrors(['curp' => 'Revisa tu CURP: debe tener 18 caracteres y coincidir con el formato oficial.'])->withInput();
         }
 
         $alumno = Alumno::where('curp', $curp)->first();

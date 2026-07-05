@@ -27,7 +27,7 @@ class VerificacionController extends Controller
         $folioOk = ! empty($data['folio_examen']) && hash_equals((string) $proceso->folio_examen, (string) $data['folio_examen']);
 
         if (! $fechaOk && ! $folioOk) {
-            return back()->withErrors(['verificacion' => 'El dato de verificación no coincide.']);
+            return back()->withErrors(['verificacion' => 'No pudimos confirmar tu identidad con ese dato. Revisa la fecha o el folio e intenta de nuevo.']);
         }
 
         $request->session()->put('alumno_nivel_sensible', true);

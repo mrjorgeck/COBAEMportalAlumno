@@ -26,7 +26,7 @@ class AuthController extends Controller
         // Solo usuarios activos pueden iniciar sesión.
         if (! Auth::attempt([...$credentials, 'activo' => true], $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => 'Las credenciales no coinciden con nuestros registros.',
+                'email' => 'No pudimos iniciar sesión con esos datos. Revisa tu correo y contraseña.',
             ]);
         }
 
