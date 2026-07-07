@@ -8,10 +8,12 @@ Pasos manuales en hPanel antes del primer despliegue (detalle en `docs/08-despli
 - [ ] Activar "Forzar HTTPS"
 
 ## SSH
-- [ ] Habilitar acceso SSH (anotar host y puerto, usualmente 65002)
+- [ ] Habilitar acceso SSH: `ssh -p 65002 u132762550@46.202.183.138`
 - [ ] Generar llave local: `ssh-keygen -t ed25519 -C "deploy-cobaem"`
 - [ ] Registrar la llave pública en hPanel → SSH → Manage SSH keys
-- [ ] Probar conexión: `ssh -p 65002 u132762550@<host>`
+- [ ] Guardar la llave privada local en `cert/hostinger_antigua_ed25519` (`cert/` está ignorado por git)
+- [ ] En Windows, corregir permisos si OpenSSH rechaza la llave: `icacls cert\hostinger_antigua_ed25519 /inheritance:r /grant:r "%USERNAME%:R"`
+- [ ] Probar conexión con llave privada local: `ssh -p 65002 -i cert/hostinger_antigua_ed25519 -o IdentitiesOnly=yes u132762550@46.202.183.138`
 - [ ] Verificar PHP CLI: `php -v` (debe ser 8.3; si no, ubicar binario 8.3)
 
 ## Base de datos
@@ -21,7 +23,7 @@ Pasos manuales en hPanel antes del primer despliegue (detalle en `docs/08-despli
 
 ## Estructura y aplicación
 - [ ] `mkdir -p ~/apps ~/backups` y `git clone <repo> ~/apps/portal`
-- [ ] Crear `~/apps/portal/.env` a mano (plantilla en docs/08 §1.5) — nunca en git
+- [ ] Crear `~/apps/portal/portal/.env` a mano (plantilla en docs/08 §1.5) — nunca en git
 - [ ] `composer install --no-dev --optimize-autoloader`
 - [ ] `php artisan key:generate`
 - [ ] `php artisan migrate --force --seed`

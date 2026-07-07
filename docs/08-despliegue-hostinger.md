@@ -12,9 +12,12 @@ Producción: `https://registrocobaemario.ariocentro.com` · BD `u132762550_COBAE
    *Nota: el sitio debe operar en `https://`; la referencia `http://` del requerimiento queda solo como redirección.*
 
 ### 1.2 SSH con llave (el "certificado" de despliegue)
-1. hPanel → Avanzado → Acceso SSH: habilitar; anotar host, puerto (normalmente 65002) y usuario (`u132762550`).
+1. hPanel → Avanzado → Acceso SSH: habilitar; conexión base `ssh -p 65002 u132762550@46.202.183.138`.
 2. Generar llave local: `ssh-keygen -t ed25519 -C "deploy-cobaem"` y registrar la pública en hPanel → SSH → Manage SSH keys.
-3. Probar: `ssh -p 65002 u132762550@<host>`.
+   - Para este repo, la llave privada local usada por defecto es `cert/hostinger_antigua_ed25519`.
+   - `cert/` está ignorado por git; no subir llaves ni certificados al repositorio.
+   - En Windows, si OpenSSH marca `UNPROTECTED PRIVATE KEY FILE`, restringir permisos: `icacls cert\hostinger_antigua_ed25519 /inheritance:r /grant:r "%USERNAME%:R"`.
+3. Probar con la llave privada local: `ssh -p 65002 -i cert/hostinger_antigua_ed25519 -o IdentitiesOnly=yes u132762550@46.202.183.138`.
 
 ### 1.3 Estructura en el servidor
 Hostinger compartido no permite cambiar document root arbitrariamente, así que se usa el patrón app-fuera-del-webroot + symlink:
@@ -27,11 +30,11 @@ Hostinger compartido no permite cambiar document root arbitrariamente, así que 
 │   └── portal/                   # aplicación Laravel
 │       ├── .env                  # SOLO aquí: credenciales de producción
 │       ├── public/ ...
-└── domains/ariocentro.com/public_html/registrocobaemario/
+└── domains/registrocobaemario.ariocentro.com/public_html/
         → symlink a /home/u132762550/apps/portal/portal/public
 ```
 
-Si el panel no permite symlink del folder del subdominio: alternativa soportada — dejar el subdominio apuntando a su carpeta y crear dentro un symlink a `public`, o mover el contenido de `public/` y ajustar `index.php` (última opción, documentar si se usa).
+Si el panel no permite reemplazar `public_html` por symlink: alternativa soportada — dejar el subdominio apuntando a su carpeta, vaciar `public_html` y copiar ahí el contenido de `portal/public` ajustando `index.php` (última opción, documentar si se usa).
 
 ### 1.4 Base de datos
 1. hPanel → Bases de datos: confirmar `u132762550_COBAEM`, crear usuario dedicado y contraseña fuerte, privilegios solo sobre esa BD.
@@ -75,7 +78,7 @@ Los assets se compilan **localmente** (no hay Node garantizado en el servidor): 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-SERVER="u132762550@<host> -p 65002"
+SERVER="u132762550@46.202.183.138 -p 65002"
 REPO="/home/u132762550/apps/portal"
 APP="$REPO/portal"
 
@@ -85,10 +88,10 @@ npm ci && npm run build
 cd ..
 
 # 2. Subir assets compilados
-rsync -avz -e "ssh -p 65002" portal/public/build/ u132762550@<host>:$APP/public/build/
+rsync -avz -e "ssh -p 65002 -i cert/hostinger_antigua_ed25519 -o IdentitiesOnly=yes" portal/public/build/ u132762550@46.202.183.138:$APP/public/build/
 
 # 3. Actualizar código y dependencias en servidor
-ssh $SERVER bash -s <<'EOF'
+ssh -i cert/hostinger_antigua_ed25519 -o IdentitiesOnly=yes $SERVER bash -s <<'EOF'
 cd /home/u132762550/apps/portal
 php portal/artisan down --retry=30
 git pull origin main
@@ -102,10 +105,18 @@ EOF
 
 Verificar versión de PHP CLI en servidor (`php -v`); si el CLI default no es 8.3 usar la ruta explícita (ej. `/usr/bin/php8.3` o el alias que indique Hostinger).
 
+El script `deploy/deploy.sh` toma esta llave por defecto. Si necesitas usar otra, ejecuta:
+
+```bash
+DEPLOY_SSH_KEY=/ruta/a/otra_llave ./deploy/deploy.sh
+```
+
+La conexión base del despliegue es `ssh -p 65002 u132762550@46.202.183.138`; el script agrega la llave privada local automáticamente. Si Hostinger cambia el host SSH, se puede sobreescribir con `DEPLOY_SSH_HOST`.
+
 ## 3. Primer despliegue
 
 ```bash
-ssh -p 65002 u132762550@<host>
+ssh -p 65002 -i cert/hostinger_antigua_ed25519 -o IdentitiesOnly=yes u132762550@46.202.183.138
 cd ~/apps && git clone <repo> portal && cd portal/portal
 composer install --no-dev --optimize-autoloader
 cp .env.example .env   # editar con credenciales reales
