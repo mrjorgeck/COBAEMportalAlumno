@@ -16,3 +16,4 @@ Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3')
 
 Schedule::command('queue:prune-failed --hours=168')->daily();
 Schedule::command('auth:clear-resets')->daily();
+Schedule::command('db:backup-predeploy --daily')->dailyAt('02:15');

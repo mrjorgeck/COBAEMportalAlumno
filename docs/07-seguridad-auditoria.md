@@ -48,11 +48,11 @@ Vista `/admin/auditoria` con filtros (usuario, modelo, fecha). Retención: todo 
 
 ## 7. Aviso de privacidad (SEG-07)
 
-Página pública + checkbox obligatorio en registro (guarda `acepto_privacidad_at`) + texto en el PDF. El contenido legal lo provee el plantel (pendiente de redacción institucional — marcado como pendiente del proyecto).
+Página pública con versión integral tomada de `docs/aviso-privacidad.md` + versión simplificada junto al checkbox obligatorio en registro (guarda `acepto_privacidad_at`) + texto en el PDF. Las finalidades secundarias de imagen/voz son consentimiento separado y opcional; no condicionan el registro.
 
 ## 8. Respaldos (SEG-08, RNF-28)
 
-- `spatie/laravel-backup`: dump de BD + `storage/app/private` → zip cifrado, diario (cron), retención 14 diarios + 8 semanales.
+- Comando `php artisan db:backup-predeploy`: dump MariaDB con `mysqldump` hacia `~/backups`, usado por `deploy/deploy.sh` y programado diario por scheduler. Retención por `DB_BACKUP_RETENTION` (14 por defecto).
 - Copia externa: descarga semanal manual o subida a almacenamiento externo (Google Drive/S3) si se configura.
 - Hostinger genera respaldos propios del plan — verificar frecuencia y no depender solo de ellos.
 - Prueba de restauración documentada antes del arranque del ciclo.
