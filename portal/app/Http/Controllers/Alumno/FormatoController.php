@@ -11,9 +11,32 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormatoController extends Controller
 {
+    private const RELACIONES_FORMATO = [
+        'alumno.sexo',
+        'alumno.nacionalidad',
+        'alumno.estadoCivil',
+        'alumno.entidadNacimiento',
+        'alumno.municipioNacimiento',
+        'ciclo',
+        'plantel',
+        'tipoEstudiante',
+        'paraescolar',
+        'secundariaProcedencia',
+        'entidadSecundaria',
+        'municipioSecundaria',
+        'contacto.municipio',
+        'contacto.localidad',
+        'tutor.ocupacion',
+        'tutor.estudios',
+        'madre.ocupacion',
+        'madre.estudios',
+        'otrosDatos.beca',
+        'otrosDatos.tipoSangre',
+    ];
+
     public function alumno(Request $request): Response
     {
-        $proceso = ProcesoIngreso::with(['alumno', 'ciclo', 'plantel', 'contacto', 'tutor', 'madre', 'otrosDatos'])
+        $proceso = ProcesoIngreso::with(self::RELACIONES_FORMATO)
             ->findOrFail($request->session()->get('alumno_proceso_id'));
 
         return $this->descargar($proceso, 'descargado_alumno', null, $request->ip());
@@ -21,7 +44,7 @@ class FormatoController extends Controller
 
     public function admin(Request $request, ProcesoIngreso $proceso): Response
     {
-        $proceso->load(['alumno', 'ciclo', 'plantel', 'contacto', 'tutor', 'madre', 'otrosDatos']);
+        $proceso->load(self::RELACIONES_FORMATO);
 
         return $this->descargar($proceso, 'descargado_admin', $request->user()?->id, $request->ip());
     }
@@ -43,7 +66,11 @@ class FormatoController extends Controller
             'created_at' => now(),
         ]);
 
-        return Pdf::loadView('pdf.inscripcion.v2026.formato', compact('proceso'))
+        return Pdf::loadView('pdf.inscripcion.v2026.formato', [
+            'proceso' => $proceso,
+            'generadoEn' => now(),
+        ])
+            ->setPaper('letter')
             ->download($proceso->folio_registro.'.pdf');
     }
 }

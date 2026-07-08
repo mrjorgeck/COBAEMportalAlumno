@@ -1,6 +1,6 @@
 @props([
-    'label' => 'Buscar',
-    'placeholder' => 'Escribe para filtrar',
+    'label' => 'Filtrar opciones',
+    'placeholder' => 'Filtrar opciones',
 ])
 
 <div
@@ -24,6 +24,7 @@
     }"
     class="space-y-2"
 >
+    <span class="block text-xs font-medium text-gray-600">{{ $label }}</span>
     <input
         type="search"
         x-model="query"
@@ -32,7 +33,7 @@
         autocomplete="off"
         aria-label="{{ $label }}"
         placeholder="{{ $placeholder }}"
-        class="min-h-11 w-full rounded border-gray-300 text-sm"
+        class="min-h-10 w-full rounded border-gray-300 bg-gray-50 text-sm"
     >
     <div x-ref="selectWrap">
         {{ $slot }}

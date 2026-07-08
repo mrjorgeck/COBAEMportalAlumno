@@ -24,6 +24,53 @@ class ClaveRespuesta extends Model
         return ['ponderacion' => 'decimal:2'];
     }
 
+    public function setRespuestaCorrectaAttribute(?string $value): void
+    {
+        $this->attributes['respuesta_correcta'] = self::normalizarRespuestasCorrectas($value);
+    }
+
+    public function respuestasCorrectas(): array
+    {
+        return self::separarRespuestasCorrectas($this->respuesta_correcta);
+    }
+
+    public function esRespuestaCorrecta(?string $respuesta): bool
+    {
+        $respuesta = self::normalizarRespuesta($respuesta);
+
+        return $respuesta !== '' && in_array($respuesta, $this->respuestasCorrectas(), true);
+    }
+
+    public static function normalizarRespuestasCorrectas(?string $value): string
+    {
+        $respuestas = self::separarRespuestasCorrectas($value);
+
+        return implode(',', $respuestas);
+    }
+
+    private static function separarRespuestasCorrectas(?string $value): array
+    {
+        $value = mb_strtoupper(trim((string) $value));
+
+        if ($value === '') {
+            return [];
+        }
+
+        preg_match_all('/[A-Z]/', $value, $matches);
+
+        return collect($matches[0] ?? [])
+            ->map(fn (string $respuesta) => self::normalizarRespuesta($respuesta))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private static function normalizarRespuesta(?string $value): string
+    {
+        return mb_substr(mb_strtoupper(trim((string) $value)), 0, 1);
+    }
+
     public function examen(): BelongsTo
     {
         return $this->belongsTo(Examen::class);

@@ -34,7 +34,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('examen_id')->constrained('examenes')->cascadeOnDelete();
             $table->unsignedSmallInteger('pregunta');
-            $table->char('respuesta_correcta', 1);
+            $table->string('respuesta_correcta', 20);
             $table->foreignId('area_id')->constrained('catalogos');
             $table->foreignId('materia_id')->nullable()->constrained('catalogos')->nullOnDelete();
             $table->string('competencia', 150)->nullable();

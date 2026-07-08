@@ -588,7 +588,7 @@ Debe manejar:
 
 ### 13.2 Clave de respuestas
 
-El sistema debe permitir cargar clave de respuestas por examen.
+El sistema debe permitir cargar clave de respuestas por examen. Una pregunta puede tener una o más respuestas válidas cuando el instrumento lo indique; para importación se aceptan opciones separadas por coma, diagonal o sin separador, normalizadas internamente como lista (`B,C`).
 
 Campos mínimos:
 
@@ -596,7 +596,7 @@ Campos mínimos:
 |---|
 | Examen |
 | Pregunta |
-| Respuesta correcta |
+| Respuesta correcta o respuestas válidas |
 | Área |
 | Materia |
 | Competencia |

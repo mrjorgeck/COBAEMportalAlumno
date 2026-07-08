@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reporte dinámico | Desarrollo orquestado con agentes IA | Nanoforge Systems</title>
+<meta name="description" content="Reporte dinámico para presentar al equipo de desarrollo de Bolivia el caso COBAEM y la metodología Nanoforge de desarrollo orquestado con agentes IA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --grafito:#1E242B;
+  --noche:#111B26;
+  --panel:#F8FAFC;
+  --linea:#E5E7EB;
+  --texto:#1E242B;
+  --muted:#607080;
+  --azul:#2563EB;
+  --cian:#00B8D9;
+  --cobre:#C7793F;
+  --ok:#15803D;
+  --warn:#B45309;
+  --shadow:0 18px 48px rgba(17,27,38,.12);
+  --radius:8px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:#F8FAFC;
+  color:var(--texto);
+  font-family:Inter,Arial,sans-serif;
+  line-height:1.55;
+}
+body.presentando{overflow:hidden;background:var(--noche)}
+h1,h2,h3{font-family:Sora,Arial,sans-serif;line-height:1.08;letter-spacing:0;margin:0}
+p{margin:0}
+a{color:inherit}
+code,.mono{font-family:"IBM Plex Mono",Consolas,monospace}
+.shell{
+  display:grid;
+  grid-template-columns:280px minmax(0,1fr);
+  min-height:100vh;
+}
+.sidebar{
+  position:sticky;
+  top:0;
+  height:100vh;
+  padding:24px 20px;
+  background:var(--noche);
+  color:#fff;
+  border-right:1px solid rgba(255,255,255,.08);
+}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.brand img{width:54px;height:46px;object-fit:contain}
+.brand strong{display:block;font-family:Sora,Arial,sans-serif;font-size:15px}
+.brand span{display:block;color:#A7B0BA;font-size:12px}
+.nav{display:grid;gap:6px;margin-top:24px}
+.nav a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 10px;
+  color:#D7DEE7;
+  text-decoration:none;
+  border-radius:8px;
+  font-size:13px;
+}
+.nav a::before{
+  content:attr(data-num);
+  width:24px;
+  height:24px;
+  display:inline-grid;
+  place-items:center;
+  border:1px solid rgba(0,184,217,.45);
+  color:#7BE3F3;
+  border-radius:6px;
+  font-family:"IBM Plex Mono",Consolas,monospace;
+  font-size:11px;
+}
+.nav a.activo,.nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.side-actions{position:absolute;left:20px;right:20px;bottom:22px;display:grid;gap:10px}
+button,.button{
+  border:1px solid transparent;
+  border-radius:8px;
+  padding:10px 12px;
+  font:700 13px Sora,Arial,sans-serif;
+  cursor:pointer;
+  text-decoration:none;
+  text-align:center;
+}
+.primary{background:var(--azul);color:#fff}
+.secondary{background:transparent;border-color:rgba(255,255,255,.22);color:#fff}
+.progress{position:fixed;left:280px;right:0;top:0;height:4px;background:transparent;z-index:20}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--azul),var(--cian),var(--cobre))}
+main{min-width:0}
+.section{
+  min-height:100vh;
+  padding:72px clamp(28px,5vw,74px);
+  border-bottom:1px solid var(--linea);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.section.narrow{min-height:auto;padding-top:72px;padding-bottom:72px}
+.hero{
+  background:
+    linear-gradient(120deg,rgba(17,27,38,.96),rgba(30,36,43,.94)),
+    repeating-linear-gradient(90deg,rgba(0,184,217,.10) 0 1px,transparent 1px 92px);
+  color:#fff;
+}
+.hero-logo{width:min(520px,86vw);height:auto;margin-bottom:40px}
+.kicker{
+  color:var(--cian);
+  font:600 13px "IBM Plex Mono",Consolas,monospace;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+h1{font-size:clamp(38px,6vw,74px);max-width:980px}
+h2{font-size:clamp(30px,4vw,52px);max-width:900px}
+h3{font-size:18px;margin-bottom:8px}
+.lead{font-size:clamp(18px,2vw,23px);max-width:880px;color:#D7DEE7;margin-top:24px}
+.hero .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  padding:5px 12px;
+  border:1px solid rgba(0,184,217,.45);
+  border-radius:999px;
+  color:#D7F8FC;
+  background:rgba(0,184,217,.08);
+  font:500 12px "IBM Plex Mono",Consolas,monospace;
+}
+.grid{display:grid;gap:18px;margin-top:28px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{
+  background:#fff;
+  border:1px solid var(--linea);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:0 1px 0 rgba(17,27,38,.03);
+}
+.card.dark{background:#172231;border-color:rgba(255,255,255,.08);color:#fff}
+.card h3{color:var(--azul)}
+.card.dark h3{color:#7BE3F3}
+.card p,.list li{color:var(--muted);font-size:15px}
+.card.dark p{color:#D7DEE7}
+.metric{font-family:Sora,Arial,sans-serif;font-size:42px;font-weight:800;line-height:1;color:var(--grafito)}
+.card.dark .metric{color:#fff}
+.metric small{display:block;margin-top:8px;font:500 13px Inter,Arial,sans-serif;color:var(--muted)}
+.callout{
+  margin-top:28px;
+  max-width:1000px;
+  padding:18px 22px;
+  border-left:4px solid var(--cobre);
+  background:#FFF7ED;
+  border-radius:0 8px 8px 0;
+  color:#5F4632;
+}
+.callout strong{color:var(--grafito)}
+.question{
+  font-size:clamp(30px,4.6vw,60px);
+  font-family:Sora,Arial,sans-serif;
+  max-width:980px;
+  line-height:1.12;
+}
+.muted{color:var(--muted)}
+.accent{color:var(--cian)}
+.forge{color:var(--cobre)}
+.role-map{
+  display:grid;
+  grid-template-columns:1fr 64px 1fr 64px 1fr;
+  gap:0;
+  align-items:stretch;
+  margin-top:32px;
+}
+.role{
+  background:#fff;
+  border:1px solid var(--linea);
+  border-radius:8px;
+  padding:24px;
+}
+.role .tag{font:600 12px "IBM Plex Mono",Consolas,monospace;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.role.humano{border-top:5px solid var(--cobre)}
+.role.arq{border-top:5px solid var(--cian)}
+.role.dev{border-top:5px solid var(--azul)}
+.arrow{display:grid;place-items:center;color:var(--muted);font:700 26px Sora,Arial,sans-serif}
+.steps{display:grid;gap:12px;margin-top:28px;counter-reset:paso}
+.step{
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  gap:14px;
+  align-items:start;
+  padding:16px 18px;
+  background:#fff;
+  border:1px solid var(--linea);
+  border-radius:8px;
+}
+.step::before{
+  counter-increment:paso;
+  content:counter(paso);
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:var(--azul);
+  color:#fff;
+  font:700 17px Sora,Arial,sans-serif;
+}
+.step strong{display:block;margin-bottom:3px}
+.step span{color:var(--muted);font-size:15px}
+.timeline{display:grid;gap:12px;margin-top:28px}
+.bar{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;align-items:center}
+.bar-label{font:500 13px "IBM Plex Mono",Consolas,monospace;color:var(--muted)}
+.track{height:34px;background:#E9EEF4;border-radius:8px;overflow:hidden}
+.fill{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:12px;background:linear-gradient(90deg,var(--azul),var(--cian));color:#fff;font:600 12px "IBM Plex Mono",Consolas,monospace;white-space:nowrap}
+.fill.copper{background:linear-gradient(90deg,var(--cobre),#E59D62)}
+table{width:100%;border-collapse:collapse;margin-top:28px;background:#fff;border:1px solid var(--linea);border-radius:8px;overflow:hidden}
+th,td{text-align:left;vertical-align:top;padding:14px 16px;border-bottom:1px solid var(--linea)}
+th{font:700 12px Sora,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--azul);background:#F3F7FB}
+td{font-size:14.5px;color:var(--muted)}
+td:first-child{color:var(--texto);font-weight:600}
+.status-ok{color:var(--ok);font-weight:700}
+.status-warn{color:var(--warn);font-weight:700}
+details{
+  margin-top:18px;
+  background:#fff;
+  border:1px solid var(--linea);
+  border-radius:8px;
+  padding:16px 18px;
+}
+summary{cursor:pointer;font:700 15px Sora,Arial,sans-serif;color:var(--grafito)}
+details p{margin-top:10px;color:var(--muted);font-size:15px}
+.brand-rules{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
+.rule{padding:18px;border-radius:8px;border:1px solid var(--linea);background:#fff}
+.rule strong{display:block;margin-bottom:8px;font-family:Sora,Arial,sans-serif}
+.rule ul{margin:0;padding-left:18px;color:var(--muted)}
+.footer-note{font-size:13px;color:var(--muted);margin-top:24px}
+.present-controls{
+  display:none;
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  z-index:40;
+  gap:10px;
+  align-items:center;
+  padding:8px;
+  background:rgba(17,27,38,.88);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+}
+.present-controls button{background:#172231;color:#fff;border-color:rgba(255,255,255,.16)}
+.present-controls span{color:#D7DEE7;font:500 12px "IBM Plex Mono",Consolas,monospace;padding:0 8px}
+body.presentando .shell{display:block}
+body.presentando .sidebar,body.presentando .progress{display:none}
+body.presentando main{height:100vh;overflow:hidden}
+body.presentando .section{display:none;height:100vh;min-height:100vh;border:0}
+body.presentando .section.activa{display:flex}
+body.presentando .present-controls{display:flex}
+@media (max-width:960px){
+  .shell{display:block}
+  .sidebar{position:relative;height:auto;padding:18px}
+  .side-actions{position:static;margin-top:18px}
+  .progress{left:0}
+  .section{min-height:auto;padding:46px 20px}
+  .g2,.g3,.g4,.role-map,.brand-rules{grid-template-columns:1fr}
+  .arrow{display:none}
+  .bar{grid-template-columns:1fr}
+}
+@media print{
+  .sidebar,.progress,.present-controls{display:none!important}
+  .shell{display:block}
+  .section{min-height:auto;page-break-after:always}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/nanoforge-isotipo.svg" alt="Nanoforge Systems">
+      <div><strong>Nanoforge Systems</strong><span>Tecnología que ordena, conecta y libera.</span></div>
+    </div>
+    <nav class="nav" id="nav" aria-label="Secciones del reporte">
+      <a href="#portada" data-num="01">Portada</a>
+      <a href="#tesis" data-num="02">Tesis</a>
+      <a href="#solucion" data-num="03">Solución</a>
+      <a href="#arquitectura" data-num="04">Arquitectura</a>
+      <a href="#metodologia" data-num="05">Tres roles</a>
+      <a href="#prompt" data-num="06">Prompt replicable</a>
+      <a href="#timeline" data-num="07">Historia</a>
+      <a href="#auditoria" data-num="08">Auditoría</a>
+      <a href="#metricas" data-num="09">Métricas</a>
+      <a href="#replica" data-num="10">Piloto</a>
+    </nav>
+    <div class="side-actions">
+      <button class="primary" id="present-btn" type="button">Modo presentación</button>
+      <button class="secondary" onclick="window.print()" type="button">Imprimir / PDF</button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <section id="portada" class="section hero">
+      <img class="hero-logo" src="assets/nanoforge-logo-fondo-oscuro.svg" alt="Nanoforge Systems">
+      <div class="kicker">Caso real · COBAEM Plantel Ario de Rosales</div>
+      <h1>De requerimientos a producción en 8 horas reales de trabajo orquestado con agentes IA</h1>
+      <p class="lead">Un portal académico completo, probado, auditado y desplegado en 4 días calendario. No como promesa de laboratorio: como sistema real en producción.</p>
+      <div class="meta">
+        <span class="pill">Producción: registrocobaemario.ariocentro.com</span>
+        <span class="pill">Repo: github.com/mrjorgeck/COBAEMportalAlumno</span>
+        <span class="pill">Trabajo efectivo: 8 h reales</span>
+      </div>
+    </section>
+
+    <section id="tesis" class="section">
+      <div class="kicker">Encuadre</div>
+      <p class="question">La pregunta correcta no es “¿la IA escribió el código?”. Es “¿qué sistema de ingeniería permite que ese código llegue a producción con pruebas, auditoría y control?”.</p>
+      <div class="callout"><strong>Tesis de la presentación:</strong> el valor no está en pedirle código a un modelo. Está en separar diseño, construcción y revisión mediante contratos verificables dentro del repositorio.</div>
+      <div class="grid g3">
+        <div class="card"><h3>Contrato antes que código</h3><p>Requerimientos, ADRs, reglas críticas y criterios de aceptación numerados.</p></div>
+        <div class="card"><h3>Constructor con condición de término</h3><p>Un agente trabaja por fases hasta cumplir tests, linter, commits y restricciones duras.</p></div>
+        <div class="card"><h3>Auditoría independiente</h3><p>Otro rol revisa contra reglas de negocio, no contra los tests que el constructor ya pasó.</p></div>
+      </div>
+    </section>
+
+    <section id="solucion" class="section">
+      <div class="kicker">Qué se construyó</div>
+      <h2>Un sistema escolar multiciclo, operable en hosting compartido y pensado para usuarios reales</h2>
+      <div class="grid g2">
+        <div class="card"><h3>Dominio funcional</h3><p>Registro de aspirantes por CURP, PDF oficial de inscripción, documentación, evaluación diagnóstica, curso propedéutico, resultados, grupos, matrícula, horarios, avisos y dashboards.</p></div>
+        <div class="card"><h3>Contexto de uso</h3><p>Alumnos de alrededor de 15 años, celulares básicos, baja experiencia digital y personal administrativo no técnico. La UX no era decoración: era requisito operativo.</p></div>
+        <div class="card"><h3>Contrato funcional</h3><p>40 requerimientos funcionales, 30 no funcionales y 20 criterios de aceptación formales convertidos en pruebas automatizadas.</p></div>
+        <div class="card"><h3>Stack deliberadamente conservador</h3><p class="mono">Laravel · PHP 8.3 · MariaDB · Blade · Livewire 3 · Tailwind · GitHub Actions · deploy por SSH.</p></div>
+      </div>
+    </section>
+
+    <section id="arquitectura" class="section">
+      <div class="kicker">Decisiones registradas</div>
+      <h2>Arquitectura sobria: menos superficie para improvisación, más espacio para verificar</h2>
+      <div class="grid g3">
+        <div class="card"><h3>Monolito modular</h3><p>Para ~300 alumnos por ciclo, microservicios no agregaban valor. La única excepción es OMR como servicio externo con fallback CSV.</p></div>
+        <div class="card"><h3>Alumno sin cuenta</h3><p>Acceso por CURP y segundo dato en secciones sensibles. Cero fricción de contraseñas para el usuario menos digital.</p></div>
+        <div class="card"><h3>Identidad separada del ciclo</h3><p>Alumno y ProcesoIngreso no son lo mismo. El aislamiento histórico 2026/2027 se diseñó desde el modelo de datos.</p></div>
+        <div class="card"><h3>Catálogos administrables</h3><p>Entidades, municipios, localidades y reglas variables viven en datos administrables, no en valores hardcodeados.</p></div>
+        <div class="card"><h3>Hosting real</h3><p>Colas con driver database vía cron, PDF sin binarios, assets compilados localmente. Diseño compatible con Hostinger compartido.</p></div>
+        <div class="card"><h3>PDF versionado</h3><p>Las plantillas por ciclo permiten cambiar el formato oficial futuro sin romper documentos históricos.</p></div>
+      </div>
+    </section>
+
+    <section id="metodologia" class="section">
+      <div class="kicker">Metodología Nanoforge</div>
+      <h2>Tres roles separados a propósito, unidos por artefactos versionados</h2>
+      <div class="role-map">
+        <div class="role humano"><div class="tag">Humano</div><h3>Orquestador</h3><p>Decide producto, valida fases, resuelve lo institucional y mantiene el criterio de negocio. No necesita teclear código en el camino crítico.</p></div>
+        <div class="arrow">⇄</div>
+        <div class="role arq"><div class="tag">Agente A</div><h3>Arquitecto / revisor</h3><p>Produce diseño técnico, prompts de fase y auditoría contra reglas críticas. Es defensa independiente.</p></div>
+        <div class="arrow">⇄</div>
+        <div class="role dev"><div class="tag">Agente B</div><h3>Constructor</h3><p>Ejecuta cada fase: migraciones, modelos, Livewire, vistas, tests y commits hasta cumplir una condición de término verificable.</p></div>
+      </div>
+      <div class="callout"><strong>Contrato versionado:</strong> requerimientos → docs/01..09 → AGENTS.md → docs/prompts/. El conocimiento no vive en la memoria de una persona; vive en archivos auditables.</div>
+    </section>
+
+    <section id="prompt" class="section">
+      <div class="kicker">La pieza replicable</div>
+      <h2>Anatomía de un prompt de construcción que sí se puede auditar</h2>
+      <div class="steps">
+        <div class="step"><div><strong>Objetivo acotado</strong><span>Tareas numeradas desde un backlog existente. La fase no empieza desde una intuición suelta.</span></div></div>
+        <div class="step"><div><strong>Condición de término verificable</strong><span>Tests con nombre, suite en verde, linter limpio, restricciones cumplidas y un commit por tarea.</span></div></div>
+        <div class="step"><div><strong>Fuentes de verdad con precedencia</strong><span>Requerimientos por encima de docs, docs por encima de código. Ante conflicto, se actualiza el contrato.</span></div></div>
+        <div class="step"><div><strong>Restricciones duras</strong><span>Seguridad, convenciones, no introducir dependencias incompatibles con producción y no romper reglas críticas.</span></div></div>
+        <div class="step"><div><strong>Escalar en vez de inventar</strong><span>El agente debe detenerse ante textos legales, formatos oficiales o reglas institucionales no definidas. Esta cláusula evitó ficción plausible.</span></div></div>
+      </div>
+    </section>
+
+    <section id="timeline" class="section">
+      <div class="kicker">Historia verificable</div>
+      <h2>45 commits en una historia lineal: el proceso queda expuesto, no maquillado</h2>
+      <div class="timeline">
+        <div class="bar"><div class="bar-label">Fase 0 · Cimientos</div><div class="track"><div class="fill" style="width:18%">repo + CI + base</div></div></div>
+        <div class="bar"><div class="bar-label">Fase 1 · MVP registro</div><div class="track"><div class="fill" style="width:54%">16 commits · 45m 52s medidos</div></div></div>
+        <div class="bar"><div class="bar-label">Fase 2 · Evaluación</div><div class="track"><div class="fill" style="width:34%">9 commits</div></div></div>
+        <div class="bar"><div class="bar-label">Fase 3 · Escolar</div><div class="track"><div class="fill" style="width:24%">5 commits</div></div></div>
+        <div class="bar"><div class="bar-label">Fase UX · 9 hitos</div><div class="track"><div class="fill copper" style="width:42%">UX.0 a UX.8</div></div></div>
+      </div>
+      <div class="grid g3">
+        <div class="card"><div class="metric">8 h<small>trabajo real de orquestación</small></div><p class="mono">estimado desde sesiones del proyecto</p></div>
+        <div class="card"><div class="metric">4 días<small>de calendario a producción</small></div><p class="mono">3 → 6 julio 2026</p></div>
+        <div class="card"><div class="metric">1<small>persona orquestando</small></div><p>El trabajo crítico se movió de teclear a decidir, verificar y coordinar.</p></div>
+      </div>
+    </section>
+
+    <section id="auditoria" class="section">
+      <div class="kicker">Confianza técnica</div>
+      <h2>Los hallazgos de auditoría son el mejor argumento, no una debilidad</h2>
+      <table>
+        <thead><tr><th>Hallazgo</th><th>Severidad</th><th>Detección</th><th>Corrección</th></tr></thead>
+        <tbody>
+          <tr><td>Registro no verificaba bloqueo de edición en re-envíos del alumno, aunque los tests de fase estaban en verde.</td><td class="status-warn">Alta</td><td>Revisión estática independiente contra RF-15 y reglas críticas.</td><td class="mono">Fase 1.16 + test de regresión</td></tr>
+          <tr><td>Permiso de creación de ciclos más laxo que el diseño aprobado.</td><td class="status-warn">Media</td><td>Revisión post-Fase 3 contra docs/03.</td><td class="mono">UX.0 + test 403</td></tr>
+          <tr><td>Verificación post-deploy: HTTPS, salud de producción, sin stack traces y sin secretos en repo.</td><td class="status-ok">OK</td><td>Fetch remoto y revisión de repo.</td><td class="mono">Sin acción pendiente</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><strong>Lección:</strong> el constructor prueba lo que construye. La revisión independiente encuentra lo que nadie le pidió probar.</div>
+    </section>
+
+    <section id="metricas" class="section">
+      <div class="kicker">Números verificables</div>
+      <h2>Métricas extraídas del repositorio y de las sesiones locales de trabajo</h2>
+      <div class="grid g4">
+        <div class="card"><div class="metric">~8,500<small>líneas de aplicación</small></div><p>En 154 archivos, sin contar dependencias.</p></div>
+        <div class="card"><div class="metric">43<small>tests automatizados</small></div><p>20/20 criterios de aceptación cubiertos.</p></div>
+        <div class="card"><div class="metric">~3.67M<small>tokens incrementales</small></div><p>Estimación desde sesiones Codex del proyecto.</p></div>
+        <div class="card"><div class="metric">~87.4M<small>tokens procesados</small></div><p>Incluye entrada cacheada recontada por sesión.</p></div>
+      </div>
+      <details>
+        <summary>Dato honesto sobre el tiempo</summary>
+        <p>La ventana de commits fue más amplia y algunas sesiones locales quedaron abiertas o se solaparon. Para presentar el caso con precisión, la cifra principal es 8 horas reales de trabajo del orquestador distribuidas en 4 días calendario. En tokens, los logs locales de Codex suman ~87.4M tokens procesados incluyendo caché; la aproximación incremental sin entrada cacheada es ~3.67M.</p>
+      </details>
+    </section>
+
+    <section id="replica" class="section">
+      <div class="kicker">Propuesta para Bolivia</div>
+      <h2>Un piloto de una sola fase, con el equipo como revisor independiente</h2>
+      <div class="steps">
+        <div class="step"><div><strong>Elegir una fase acotada</strong><span>Con criterios de aceptación numerados, datos de prueba y restricciones explícitas.</span></div></div>
+        <div class="step"><div><strong>Montar el contrato</strong><span>Requerimientos, docs técnicos mínimos, AGENTS.md, CI y prompt de construcción.</span></div></div>
+        <div class="step"><div><strong>Construcción autónoma</strong><span>El agente ejecuta con condición de término. El equipo no corrige a ciegas; audita evidencia.</span></div></div>
+        <div class="step"><div><strong>Comparar contra el proceso actual</strong><span>Tiempo, defectos encontrados, retrabajo, calidad de pruebas y mantenibilidad.</span></div></div>
+      </div>
+      <div class="brand-rules">
+        <div class="rule"><strong>Lineamiento de identidad aplicado</strong><ul><li>Composición limpia, precisa y confiable.</li><li>Acentos cobre moderados como énfasis humano.</li><li>Azul/cian para tecnología, integración y flujo.</li></ul></div>
+        <div class="rule"><strong>Lo que se evitó</strong><ul><li>Saturación visual, estética cyberpunk o gamer.</li><li>Sombras pesadas y fondos que reduzcan legibilidad.</li><li>Promesas absolutas sin evidencia verificable.</li></ul></div>
+      </div>
+      <p class="footer-note">Material base: docs/presentacion/reporte-metodologia.md y docs/presentacion/script-presentacion.md. Identidad: Manual inicial de identidad Nanoforge Systems.</p>
+    </section>
+  </main>
+</div>
+
+<div class="present-controls" aria-label="Controles de presentación">
+  <button type="button" id="prev-btn">Anterior</button>
+  <span id="slide-count">1 / 10</span>
+  <button type="button" id="next-btn">Siguiente</button>
+  <button type="button" id="exit-btn">Salir</button>
+</div>
+
+<script>
+const sections = [...document.querySelectorAll('.section')];
+const links = [...document.querySelectorAll('.nav a')];
+const progressBar = document.getElementById('progress-bar');
+const presentBtn = document.getElementById('present-btn');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const exitBtn = document.getElementById('exit-btn');
+const slideCount = document.getElementById('slide-count');
+let current = 0;
+
+function setActiveByScroll(){
+  if(document.body.classList.contains('presentando')) return;
+  const y = window.scrollY + window.innerHeight * 0.35;
+  let active = 0;
+  sections.forEach((section, index) => {
+    if(section.offsetTop <= y) active = index;
+  });
+  current = active;
+  links.forEach((link,i)=>link.classList.toggle('activo', i === current));
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+}
+
+function showSlide(index){
+  current = Math.max(0, Math.min(sections.length - 1, index));
+  sections.forEach((section,i)=>section.classList.toggle('activa', i === current));
+  slideCount.textContent = `${current + 1} / ${sections.length}`;
+}
+
+function enterPresentation(){
+  document.body.classList.add('presentando');
+  showSlide(current);
+}
+
+function exitPresentation(){
+  document.body.classList.remove('presentando');
+  sections[current].scrollIntoView({block:'start'});
+  setActiveByScroll();
+}
+
+presentBtn.addEventListener('click', enterPresentation);
+prevBtn.addEventListener('click', ()=>showSlide(current - 1));
+nextBtn.addEventListener('click', ()=>showSlide(current + 1));
+exitBtn.addEventListener('click', exitPresentation);
+window.addEventListener('scroll', setActiveByScroll, {passive:true});
+document.addEventListener('keydown', event => {
+  if(event.key === 'Escape' && document.body.classList.contains('presentando')) exitPresentation();
+  if(event.key === 'f' || event.key === 'F') enterPresentation();
+  if(!document.body.classList.contains('presentando')) return;
+  if(['ArrowRight','PageDown',' '].includes(event.key)){event.preventDefault();showSlide(current + 1);}
+  if(['ArrowLeft','PageUp'].includes(event.key)){event.preventDefault();showSlide(current - 1);}
+  if(event.key >= '1' && event.key <= '9') showSlide(Number(event.key) - 1);
+  if(event.key === '0') showSlide(9);
+});
+setActiveByScroll();
+</script>
+</body>
+</html>

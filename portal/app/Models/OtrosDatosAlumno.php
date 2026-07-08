@@ -27,4 +27,14 @@ class OtrosDatosAlumno extends Model
     {
         return $this->belongsTo(ProcesoIngreso::class, 'proceso_ingreso_id');
     }
+
+    public function beca(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'beca_id');
+    }
+
+    public function tipoSangre(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'tipo_sangre_id');
+    }
 }

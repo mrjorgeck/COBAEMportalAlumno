@@ -23,6 +23,16 @@ class Familiar extends Model
         return $this->belongsTo(ProcesoIngreso::class, 'proceso_ingreso_id');
     }
 
+    public function ocupacion(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'ocupacion_id');
+    }
+
+    public function estudios(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'estudios_id');
+    }
+
     public function getNombreCompletoAttribute(): string
     {
         return trim("{$this->nombres} {$this->primer_apellido} {$this->segundo_apellido}");

@@ -19,8 +19,8 @@ class CalculoResultadosService
         $areas = [];
 
         foreach ($claves as $clave) {
-            $respuesta = mb_strtoupper(trim((string) ($respuestas[$clave->pregunta] ?? '')));
-            $correcta = $respuesta !== '' && $respuesta === mb_strtoupper($clave->respuesta_correcta);
+            $respuesta = (string) ($respuestas[$clave->pregunta] ?? '');
+            $correcta = $clave->esRespuestaCorrecta($respuesta);
             $ponderacion = (float) $clave->ponderacion;
 
             $areas[$clave->area_id] ??= ['puntaje' => 0.0, 'total' => 0.0, 'area' => $clave->area];

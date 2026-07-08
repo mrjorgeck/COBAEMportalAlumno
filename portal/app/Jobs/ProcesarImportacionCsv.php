@@ -48,7 +48,9 @@ class ProcesarImportacionCsv implements ShouldQueue
                     ? Catalogo::where('tipo', 'materia')->where('clave', trim($data['materia_clave']))->first()
                     : null;
 
-                if (! $examen || ! $area || blank($data['pregunta'] ?? null) || blank($data['respuesta_correcta'] ?? null)) {
+                $respuestaCorrecta = $this->respuestaCorrecta($data);
+
+                if (! $examen || ! $area || blank($data['pregunta'] ?? null) || $respuestaCorrecta === '') {
                     $errores++;
                     $resumen[] = ['fila' => $total + 1, 'error' => 'Examen, pregunta, respuesta o area no encontrados'];
 
@@ -58,7 +60,7 @@ class ProcesarImportacionCsv implements ShouldQueue
                 ClaveRespuesta::updateOrCreate(
                     ['examen_id' => $examen->id, 'pregunta' => (int) $data['pregunta']],
                     [
-                        'respuesta_correcta' => mb_strtoupper(trim($data['respuesta_correcta']))[0],
+                        'respuesta_correcta' => $respuestaCorrecta,
                         'area_id' => $area->id,
                         'materia_id' => $materia?->id,
                         'competencia' => $data['competencia'] ?? null,
@@ -283,5 +285,18 @@ class ProcesarImportacionCsv implements ShouldQueue
             'resumen' => $resumen,
             'estado' => $errores ? 'error' : 'completada',
         ]);
+    }
+
+    private function respuestaCorrecta(array $data): string
+    {
+        $valores = [
+            $data['respuesta_correcta'] ?? null,
+            $data['respuesta_alterna'] ?? null,
+            $data['respuesta_alternativa'] ?? null,
+            $data['opcion_2'] ?? null,
+            $data['opción_2'] ?? null,
+        ];
+
+        return ClaveRespuesta::normalizarRespuestasCorrectas(implode(',', array_filter($valores, filled(...))));
     }
 }

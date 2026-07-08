@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360">
+<rect width="1200" height="360" fill="#111B26"/>
+<g transform="translate(55,45) scale(0.68)">
+<rect width="420" height="360" fill="none"/>
+<polygon points="72,52 112,52 246,214 206,214" fill="#2563EB"/><polygon points="76,82 106,82 211,207 185,207" fill="#F8FAFC" opacity="0.98"/><polygon points="72,52 72,250 112,250 112,132" fill="#2563EB"/><polygon points="206,80 246,80 246,250 206,250" fill="#2563EB"/><path d="M252 70 H350 L330 98 H278 V128 H335 L318 153 H278 V205 H238 V102 Z" fill="#2563EB"/><path d="M254 100 H328 L316 118 H276 V141 H321 L310 158 H276 V214 H253 Z" fill="#111B26" opacity="0.93"/><path d="M210 180 H98 L58 140 H25" stroke="#00B8D9" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M214 181 V300" stroke="#00B8D9" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M214 163 V25" stroke="#00B8D9" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M227 178 H332" stroke="#00B8D9" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="25" cy="140" r="16" fill="#111B26" stroke="#00B8D9" stroke-width="8"/><circle cx="332" cy="178" r="16" fill="#111B26" stroke="#00B8D9" stroke-width="8"/><circle cx="214" cy="25" r="16" fill="#111B26" stroke="#00B8D9" stroke-width="8"/><circle cx="214" cy="300" r="16" fill="#111B26" stroke="#00B8D9" stroke-width="8"/><circle cx="214" cy="178" r="34" fill="#111B26"/><polygon points="214.0,154.0 220.1,171.9 238.0,178.0 220.1,184.1 214.0,202.0 207.9,184.1 190.0,178.0 207.9,171.9" fill="#C7793F"/>
+</g>
+<text x="390" y="155" font-family="Sora, Manrope, Inter, Arial, sans-serif" font-weight="800" font-size="92" fill="#FFFFFF">Nanoforge</text>
+<text x="393" y="230" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="44" letter-spacing="28" fill="#A7B0BA">SYSTEMS</text>
+<text x="390" y="282" font-family="Inter, Arial, sans-serif" font-size="24" letter-spacing="5" fill="#A7B0BA">TECNOLOGIA QUE ORDENA, CONECTA Y LIBERA.</text>
+</svg>

@@ -22,4 +22,14 @@ class DatosContacto extends Model
     {
         return $this->belongsTo(ProcesoIngreso::class, 'proceso_ingreso_id');
     }
+
+    public function municipio(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'municipio_id');
+    }
+
+    public function localidad(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'localidad_id');
+    }
 }

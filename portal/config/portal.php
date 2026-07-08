@@ -33,6 +33,10 @@ return [
     // Versión de plantilla PDF que se asigna a procesos nuevos (ADR-07).
     'pdf_plantilla_actual' => 'v2026',
 
+    'pdf' => [
+        'lugar_expedicion' => env('PORTAL_PDF_LUGAR_EXPEDICION', 'Ario de Rosales, Michoacan'),
+    ],
+
     // Columnas del export "archivo enriquecido" para la plataforma federal
     // (RF-18). PENDIENTE: confirmar estructura oficial con el plantel
     // (docs/09 §6.4). Se define aquí para no hardcodear en el exporter.

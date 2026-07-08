@@ -57,6 +57,34 @@ class Fase2AcceptanceTest extends TestCase
         $this->assertDatabaseHas('resultados_area', ['resultado_id' => $resultado->id, 'porcentaje' => 100]);
     }
 
+    public function test_rf12_acepta_multiples_respuestas_correctas_por_pregunta(): void
+    {
+        [$proceso, $examen] = $this->escenarioConClave();
+
+        $clave = $examen->claves()->where('pregunta', 2)->firstOrFail();
+        $clave->update(['respuesta_correcta' => 'B/C']);
+
+        $resultadoConPrincipal = app(CalculoResultadosService::class)->calcularDesdeRespuestas($proceso, $examen, [
+            1 => 'A',
+            2 => 'B',
+            3 => 'B',
+            4 => 'D',
+        ]);
+        $this->assertSame('100.00', (string) $resultadoConPrincipal->porcentaje_total);
+
+        $resultadoConAlterna = app(CalculoResultadosService::class)->calcularDesdeRespuestas($proceso, $examen, [
+            1 => 'A',
+            2 => 'C',
+            3 => 'B',
+            4 => 'D',
+        ]);
+        $this->assertSame('100.00', (string) $resultadoConAlterna->porcentaje_total);
+        $this->assertDatabaseHas('claves_respuesta', [
+            'id' => $clave->id,
+            'respuesta_correcta' => 'B,C',
+        ]);
+    }
+
     public function test_criterio_15_alumno_consulta_resultado_y_areas_de_mejora_solo_con_modulos_publicados(): void
     {
         [$proceso, $examen] = $this->escenarioConClave();

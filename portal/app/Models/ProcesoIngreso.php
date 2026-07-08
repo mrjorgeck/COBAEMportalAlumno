@@ -58,6 +58,26 @@ class ProcesoIngreso extends Model
         return $this->belongsTo(Catalogo::class, 'tipo_estudiante_id');
     }
 
+    public function paraescolar(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'paraescolar_id');
+    }
+
+    public function secundariaProcedencia(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'secundaria_procedencia_id');
+    }
+
+    public function entidadSecundaria(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'entidad_secundaria_id');
+    }
+
+    public function municipioSecundaria(): BelongsTo
+    {
+        return $this->belongsTo(Catalogo::class, 'municipio_secundaria_id');
+    }
+
     public function contacto(): HasOne
     {
         return $this->hasOne(DatosContacto::class);

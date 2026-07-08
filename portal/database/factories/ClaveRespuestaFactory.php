@@ -17,7 +17,7 @@ class ClaveRespuestaFactory extends Factory
         return [
             'examen_id' => Examen::factory(),
             'pregunta' => $this->faker->unique()->numberBetween(1, 100),
-            'respuesta_correcta' => $this->faker->randomElement(['A', 'B', 'C', 'D']),
+            'respuesta_correcta' => $this->faker->randomElement(['A', 'B', 'C', 'D', 'B,C']),
             'area_id' => Catalogo::factory()->create(['tipo' => 'area_evaluacion'])->id,
             'ponderacion' => 1,
         ];
