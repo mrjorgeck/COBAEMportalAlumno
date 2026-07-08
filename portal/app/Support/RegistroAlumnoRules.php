@@ -9,18 +9,18 @@ class RegistroAlumnoRules
 {
     public static function rules(): array
     {
-        $catalogo = fn (string $tipo) => ['required', Rule::exists('catalogos', 'id')->where('tipo', $tipo)];
+        $catalogo = fn (string $tipo) => ['required', Rule::exists('catalogos', 'id')->where('tipo', $tipo)->where('activo', true)];
         $telefono = ['nullable', 'regex:/^[0-9+()\-\s]{7,20}$/'];
         $telefonoRequerido = ['required', 'regex:/^[0-9+()\-\s]{7,20}$/'];
 
         return [
             'curp' => ['required', 'string', 'size:18'],
             'folio_examen' => [
-                'required', 'string', 'max:20',
+                'nullable', 'string', 'max:20',
                 Rule::unique('procesos_ingreso', 'folio_examen')
                     ->where('ciclo_ingreso_id', CicloIngreso::vigente()?->id),
             ],
-            'folio_examen_confirmacion' => ['required', 'string', 'max:20'],
+            'folio_examen_confirmacion' => ['nullable', 'required_with:folio_examen', 'string', 'max:20'],
             'semestre_solicitado' => ['required', 'integer', 'min:1', 'max:6'],
             'tipo_estudiante_id' => $catalogo('tipo_estudiante'),
             'paraescolar_id' => $catalogo('paraescolar'),

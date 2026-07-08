@@ -50,11 +50,11 @@
                     </p>
                 </div>
             </x-campo>
-            <x-campo for="{{ $id('folio_examen') }}" label="Folio de examen" :required="$isRequired('folio_examen')" help="Lo encuentras en la hoja de respuestas o comprobante entregado al terminar tu examen.">
-                <input id="{{ $id('folio_examen') }}" wire:key="registro-folio-examen" name="folio_examen" wire:model="form.folio_examen" autocomplete="section-folio one-time-code" aria-required="{{ $isRequired('folio_examen') ? 'true' : 'false' }}" @if($describedBy('folio_examen')) aria-describedby="{{ $describedBy('folio_examen') }}" @endif required class="{{ $input }}">
+            <x-campo for="{{ $id('folio_examen') }}" label="Folio de examen (opcional)" :required="$isRequired('folio_examen')" help="Si ya lo tienes, escríbelo como aparece en la hoja de respuestas o comprobante. Si no, puedes continuar sin capturarlo.">
+                <input id="{{ $id('folio_examen') }}" wire:key="registro-folio-examen" name="folio_examen" wire:model="form.folio_examen" autocomplete="section-folio one-time-code" aria-required="{{ $isRequired('folio_examen') ? 'true' : 'false' }}" @if($describedBy('folio_examen')) aria-describedby="{{ $describedBy('folio_examen') }}" @endif class="{{ $input }}">
             </x-campo>
-            <x-campo for="{{ $id('folio_examen_confirmacion') }}" label="Confirmar folio de examen" :required="$isRequired('folio_examen_confirmacion')">
-                <input id="{{ $id('folio_examen_confirmacion') }}" wire:key="registro-folio-examen-confirmacion" name="folio_examen_confirmacion" wire:model="form.folio_examen_confirmacion" autocomplete="section-folio-confirmacion one-time-code" aria-required="{{ $isRequired('folio_examen_confirmacion') ? 'true' : 'false' }}" @if($describedBy('folio_examen_confirmacion')) aria-describedby="{{ $describedBy('folio_examen_confirmacion') }}" @endif required class="{{ $input }}">
+            <x-campo for="{{ $id('folio_examen_confirmacion') }}" label="Confirmar folio de examen (solo si lo capturaste)" :required="$isRequired('folio_examen_confirmacion')">
+                <input id="{{ $id('folio_examen_confirmacion') }}" wire:key="registro-folio-examen-confirmacion" name="folio_examen_confirmacion" wire:model="form.folio_examen_confirmacion" autocomplete="section-folio-confirmacion one-time-code" aria-required="{{ $isRequired('folio_examen_confirmacion') ? 'true' : 'false' }}" @if($describedBy('folio_examen_confirmacion')) aria-describedby="{{ $describedBy('folio_examen_confirmacion') }}" @endif class="{{ $input }}">
             </x-campo>
             <input type="hidden" name="semestre_solicitado" wire:model="form.semestre_solicitado">
         </section>
@@ -100,7 +100,11 @@
             <x-campo for="{{ $id('paraescolar_id') }}" label="Paraescolar" :required="$isRequired('paraescolar_id')">
                 <select id="{{ $id('paraescolar_id') }}" wire:key="registro-paraescolar" name="paraescolar_id" wire:model="form.paraescolar_id" aria-required="{{ $isRequired('paraescolar_id') ? 'true' : 'false' }}" required class="{{ $select }}">
                     <option value="">Selecciona</option>
-                    @foreach ($catalogos['paraescolar'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach
+                    @foreach ($catalogos['paraescolar']->groupBy(fn ($item) => $item->metadata['categoria'] ?? 'Opciones') as $categoria => $opciones)
+                        <optgroup label="{{ $categoria }}">
+                            @foreach ($opciones as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach
+                        </optgroup>
+                    @endforeach
                 </select>
             </x-campo>
         </section>

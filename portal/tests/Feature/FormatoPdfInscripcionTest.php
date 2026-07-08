@@ -90,10 +90,14 @@ class FormatoPdfInscripcionTest extends TestCase
             'FE-001',
             'NI-2026-ARIO-9001',
             'Regular',
-            'Deportiva',
+            'Fútbol varonil',
             'Ario de Rosales',
-            'Secundaria Sintetica Oficial',
+            'Secundaria Sintetica Oficial con Nombre Largo',
+            'Ana María de la Concepción',
+            'O&#039;Farrill',
+            'Núñez',
             'Benito',
+            'He le&iacute;do y acepto',
         ] as $textoEsperado) {
             $this->assertStringContainsString($textoEsperado, $html);
         }
@@ -106,7 +110,7 @@ class FormatoPdfInscripcionTest extends TestCase
         $localidad = Catalogo::deTipo('localidad')->where('nombre', 'Ario de Rosales')->first();
         $secundaria = Catalogo::firstOrCreate(
             ['tipo' => 'secundaria', 'clave' => 'SEC-TEST-PDF'],
-            ['nombre' => 'Secundaria Sintetica Oficial', 'parent_id' => $municipio->id],
+            ['nombre' => 'Secundaria Sintetica Oficial con Nombre Largo', 'parent_id' => $municipio->id],
         );
 
         $proceso = ProcesoIngreso::factory()->create([
@@ -115,7 +119,7 @@ class FormatoPdfInscripcionTest extends TestCase
             'folio_registro' => 'NI-2026-ARIO-9001',
             'folio_examen' => 'FE-001',
             'tipo_estudiante_id' => Catalogo::deTipo('tipo_estudiante')->where('clave', 'REG')->first()->id,
-            'paraescolar_id' => Catalogo::deTipo('paraescolar')->where('clave', 'DEPORTE')->first()->id,
+            'paraescolar_id' => Catalogo::deTipo('paraescolar')->where('clave', 'DEP_FUTBOL_VARONIL')->first()->id,
             'secundaria_procedencia_id' => $secundaria->id,
             'entidad_secundaria_id' => $entidad->id,
             'municipio_secundaria_id' => $municipio->id,
@@ -124,9 +128,9 @@ class FormatoPdfInscripcionTest extends TestCase
 
         $proceso->alumno->update([
             'curp' => 'XAXX080202HMCXXXA0',
-            'nombres' => 'Ana',
-            'primer_apellido' => 'Prueba',
-            'segundo_apellido' => 'Sintetica',
+            'nombres' => 'Ana María de la Concepción',
+            'primer_apellido' => "O'Farrill",
+            'segundo_apellido' => 'Núñez',
             'entidad_nacimiento_id' => $entidad->id,
             'municipio_nacimiento_id' => $municipio->id,
         ]);

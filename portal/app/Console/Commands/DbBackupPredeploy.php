@@ -82,15 +82,20 @@ class DbBackupPredeploy extends Command
         File::ensureDirectoryExists(dirname($path), 0700);
 
         $content = "[client]\n"
-            .'host='.$config['host']."\n"
-            .'port='.$config['port']."\n"
-            .'user='.$config['username']."\n"
-            .'password='.$config['password']."\n";
+            .'host='.$this->optionValue((string) $config['host'])."\n"
+            .'port='.(int) $config['port']."\n"
+            .'user='.$this->optionValue((string) $config['username'])."\n"
+            .'password='.$this->optionValue((string) $config['password'])."\n";
 
         file_put_contents($path, $content);
         @chmod($path, 0600);
 
         return $path;
+    }
+
+    private function optionValue(string $value): string
+    {
+        return '"'.str_replace(['\\', '"'], ['\\\\', '\\"'], $value).'"';
     }
 
     private function rotateBackups(string $backupDir, string $prefix, int $retention): void

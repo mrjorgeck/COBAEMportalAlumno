@@ -17,6 +17,7 @@ use App\Models\ProcesoIngreso;
 use App\Services\CalculoResultadosService;
 use App\Services\CurpValidator;
 use App\Services\FolioService;
+use App\Support\CsvImportSchemas;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
@@ -33,9 +34,31 @@ class ProcesarImportacionCsv implements ShouldQueue
         $importacion->update(['estado' => 'procesando']);
 
         $handle = fopen(Storage::path($importacion->archivo_original_path), 'r');
-        $headers = fgetcsv($handle) ?: [];
+        $headers = array_map(fn ($header) => trim((string) $header), fgetcsv($handle) ?: []);
         $resumen = [];
-        $creados = $actualizados = $errores = $total = 0;
+        $creados = $actualizados = $omitidos = $errores = $total = 0;
+
+        $esperados = CsvImportSchemas::encabezados($importacion->tipo_importacion);
+        if ($esperados === [] || $headers !== $esperados) {
+            fclose($handle);
+            $importacion->update([
+                'total_filas' => 0,
+                'registros_creados' => 0,
+                'registros_actualizados' => 0,
+                'registros_sin_cambios' => 0,
+                'registros_error' => 1,
+                'resumen' => [[
+                    'fila' => 1,
+                    'categoria' => 'error',
+                    'error' => 'Encabezados invalidos para '.$importacion->tipo_importacion,
+                    'esperados' => $esperados,
+                    'recibidos' => $headers,
+                ]],
+                'estado' => 'error',
+            ]);
+
+            return;
+        }
 
         while (($row = fgetcsv($handle)) !== false) {
             $total++;
@@ -242,45 +265,81 @@ class ProcesarImportacionCsv implements ShouldQueue
                 continue;
             }
 
-            $alumno = Alumno::firstOrCreate(
-                ['curp' => $curp],
-                [
-                    'nombres' => $data['nombres'] ?? 'Alumno',
-                    'primer_apellido' => $data['primer_apellido'] ?? 'Importado',
-                    'segundo_apellido' => $data['segundo_apellido'] ?? null,
-                    'fecha_nacimiento' => $data['fecha_nacimiento'] ?? '2008-01-01',
+            $erroresAlumno = $this->validarFilaAlumno($data);
+            if ($erroresAlumno !== []) {
+                $errores++;
+                $resumen[] = [
+                    'fila' => $total + 1,
+                    'categoria' => 'error',
+                    'error' => 'Fila de alumno incompleta',
+                    'campos' => $erroresAlumno,
+                ];
+
+                continue;
+            }
+
+            $alumno = Alumno::where('curp', $curp)->first();
+            $folioExamen = trim((string) ($data['folio_examen'] ?? ''));
+            if ($folioExamen !== '' && ProcesoIngreso::where('ciclo_ingreso_id', $ciclo->id)
+                ->where('folio_examen', $folioExamen)
+                ->when($alumno, fn ($query) => $query->where('alumno_id', '!=', $alumno->id))
+                ->exists()) {
+                $errores++;
+                $resumen[] = [
+                    'fila' => $total + 1,
+                    'categoria' => 'error',
+                    'error' => 'Folio de examen duplicado en el ciclo',
+                    'curp' => $curp,
+                ];
+
+                continue;
+            }
+
+            if (! $alumno) {
+                $alumno = Alumno::create([
+                    'curp' => $curp,
+                    'nombres' => trim($data['nombres']),
+                    'primer_apellido' => trim($data['primer_apellido']),
+                    'segundo_apellido' => blank($data['segundo_apellido'] ?? null) ? null : trim($data['segundo_apellido']),
+                    'fecha_nacimiento' => trim($data['fecha_nacimiento']),
                     'sexo_id' => Catalogo::deTipo('sexo')->first()->id,
                     'nacionalidad_id' => Catalogo::deTipo('nacionalidad')->first()->id,
                     'estado_civil_id' => Catalogo::deTipo('estado_civil')->first()->id,
                     'entidad_nacimiento_id' => Catalogo::deTipo('entidad')->first()->id,
                     'municipio_nacimiento_id' => Catalogo::deTipo('municipio')->first()->id,
-                ],
-            );
+                ]);
+            }
 
             $proceso = ProcesoIngreso::firstOrNew(['alumno_id' => $alumno->id, 'ciclo_ingreso_id' => $ciclo->id]);
             if (! $proceso->exists) {
                 $proceso->folio_registro = $folioService->generar($ciclo, $plantel);
                 $creados++;
+                $categoria = 'creado';
             } else {
                 $actualizados++;
+                $categoria = 'actualizado';
             }
             $proceso->fill([
                 'plantel_id' => $plantel->id,
-                'folio_examen' => $data['folio_examen'] ?? $proceso->folio_examen,
+                'folio_examen' => $folioExamen !== '' ? $folioExamen : $proceso->folio_examen,
                 'tipo_estudiante_id' => Catalogo::deTipo('tipo_estudiante')->first()->id,
                 'promedio_secundaria' => $data['promedio_secundaria'] ?? 0,
                 'estatus_proceso' => 'registrado',
                 'acepto_privacidad_at' => now(),
                 'fecha_registro' => now(),
             ])->save();
+            $resumen[] = ['fila' => $total + 1, 'categoria' => $categoria, 'curp' => $curp];
         }
 
         fclose($handle);
+
+        $resumen = array_map(fn (array $fila) => $fila + ['categoria' => 'error'], $resumen);
 
         $importacion->update([
             'total_filas' => $total,
             'registros_creados' => $creados,
             'registros_actualizados' => $actualizados,
+            'registros_sin_cambios' => $omitidos,
             'registros_error' => $errores,
             'resumen' => $resumen,
             'estado' => $errores ? 'error' : 'completada',
@@ -298,5 +357,25 @@ class ProcesarImportacionCsv implements ShouldQueue
         ];
 
         return ClaveRespuesta::normalizarRespuestasCorrectas(implode(',', array_filter($valores, filled(...))));
+    }
+
+    private function validarFilaAlumno(array $data): array
+    {
+        $errores = [];
+
+        foreach (['nombres', 'primer_apellido', 'fecha_nacimiento'] as $campo) {
+            if (blank($data[$campo] ?? null)) {
+                $errores[] = $campo;
+            }
+        }
+
+        if (! blank($data['fecha_nacimiento'] ?? null)) {
+            $fecha = \DateTimeImmutable::createFromFormat('Y-m-d', trim($data['fecha_nacimiento']));
+            if (! $fecha || $fecha->format('Y-m-d') !== trim($data['fecha_nacimiento'])) {
+                $errores[] = 'fecha_nacimiento';
+            }
+        }
+
+        return array_values(array_unique($errores));
     }
 }

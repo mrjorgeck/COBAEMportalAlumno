@@ -25,7 +25,10 @@ class UxAcceptanceTest extends TestCase
             ->assertSee('Los campos marcados con', false)
             ->assertSee('name="curp"', false)
             ->assertSee('aria-required="true"', false)
-            ->assertSee('Folio de examen', false);
+            ->assertSee('Folio de examen (opcional)', false)
+            ->assertSee('name="folio_examen"', false)
+            ->assertSee('aria-required="false"', false)
+            ->assertDontSee('name="folio_examen" wire:model="form.folio_examen" autocomplete="section-folio one-time-code" aria-required="true"', false);
     }
 
     public function test_mensajes_de_validacion_salen_en_espanol_con_atributos_humanos(): void

@@ -73,7 +73,7 @@ class RegistroAlumnoService
 
             $proceso->fill([
                 'plantel_id' => $plantel->id,
-                'folio_examen' => $data['folio_examen'],
+                'folio_examen' => blank($data['folio_examen'] ?? null) ? null : $data['folio_examen'],
                 'semestre_solicitado' => $data['semestre_solicitado'] ?? 1,
                 'tipo_estudiante_id' => $data['tipo_estudiante_id'],
                 'paraescolar_id' => $data['paraescolar_id'] ?? null,

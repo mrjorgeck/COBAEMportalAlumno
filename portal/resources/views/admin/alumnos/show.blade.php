@@ -13,7 +13,7 @@
             <input name="nombres" value="{{ old('nombres', $proceso->alumno->nombres) }}" class="mt-3 w-full rounded border-gray-300">
             <input name="primer_apellido" value="{{ old('primer_apellido', $proceso->alumno->primer_apellido) }}" class="mt-3 w-full rounded border-gray-300">
             <input name="segundo_apellido" value="{{ old('segundo_apellido', $proceso->alumno->segundo_apellido) }}" class="mt-3 w-full rounded border-gray-300">
-            <input name="folio_examen" value="{{ old('folio_examen', $proceso->folio_examen) }}" class="mt-3 w-full rounded border-gray-300">
+            <input name="folio_examen" value="{{ old('folio_examen', $proceso->folio_examen) }}" placeholder="Folio de examen (opcional)" class="mt-3 w-full rounded border-gray-300">
             <select name="estatus_proceso" class="mt-3 w-full rounded border-gray-300">
                 @foreach (['registro_incompleto', 'registrado', 'requiere_correccion', 'validado'] as $estado)
                     <option @selected($proceso->estatus_proceso === $estado) value="{{ $estado }}">{{ $estado }}</option>

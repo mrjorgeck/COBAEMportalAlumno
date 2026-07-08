@@ -66,3 +66,13 @@ Exportaciones grandes: streaming (`streamDownload`) para no agotar memoria. Toda
 - Campos vacíos se imprimen con línea en blanco (como el formato físico).
 - Nombre de archivo: `{folio_registro}_{CURP}.pdf`.
 - Descarga alumno: requiere sesión nivel sensible. Descarga admin: permiso `formatos.descargar`. Ambas auditadas.
+
+### Checklist de verificación v2026
+
+- Encabezado institucional: nombre COBAEM, plantel, clave del plantel y periodo escolar visibles.
+- Folios: `folio_examen` impreso como No. de Ficha y `folio_registro` impreso en la traza del portal.
+- Secciones: datos del estudiante, dirección, contacto, escuela de procedencia, tutor, madre, otros datos, aviso de privacidad, lugar/fecha y firma.
+- Fidelidad de datos: CURP, nombre completo, tipo de estudiante, paraescolar, secundaria, beca y datos de contacto presentes.
+- Caracteres especiales: la plantilla usa DejaVu Sans y el test cubre acentos, ñ y apóstrofos escapados en HTML.
+- Campos largos: el test de `FormatoPdfInscripcionTest` usa nombres y secundaria largos para validar render sin perder contenido.
+- Historial: no editar plantillas de ciclos cerrados; un cambio oficial estructural debe crear una nueva carpeta `v{año}`.

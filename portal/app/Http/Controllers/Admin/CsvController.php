@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\ProcesarImportacionCsv;
 use App\Models\ImportacionCsv;
 use App\Models\ProcesoIngreso;
+use App\Support\CsvImportSchemas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -104,7 +105,7 @@ class CsvController extends Controller
     public function importar(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'tipo_importacion' => ['required', 'in:alumnos,documentacion,clave_respuestas,resultados_examen,respuestas_examen,grupo_propedeutico,grupo_escolar,matriculas,horarios'],
+            'tipo_importacion' => ['required', 'in:'.implode(',', CsvImportSchemas::TIPOS)],
             'archivo' => ['required', 'file', 'mimes:csv,txt'],
         ]);
 
@@ -123,15 +124,7 @@ class CsvController extends Controller
 
     public function plantilla(string $tipo): StreamedResponse
     {
-        $plantillas = [
-            'clave_respuestas' => ['examen_id', 'pregunta', 'respuesta_correcta', 'area_clave', 'materia_clave', 'competencia', 'ponderacion'],
-            'respuestas_examen' => ['examen_id', 'folio_examen', '1', '2', '3'],
-            'resultados_examen' => ['examen_id', 'folio_examen', 'puntaje_total', 'porcentaje_total', 'nivel_riesgo_clave', 'nivel_desempeno_clave', 'MAT_puntaje', 'MAT_porcentaje', 'MAT_riesgo'],
-            'grupo_propedeutico' => ['ciclo', 'curp', 'folio_examen', 'grupo'],
-            'grupo_escolar' => ['ciclo', 'curp', 'folio_examen', 'grupo'],
-            'matriculas' => ['ciclo', 'curp', 'folio_examen', 'matricula'],
-            'horarios' => ['ciclo', 'grupo', 'dia', 'hora_inicio', 'hora_fin', 'materia', 'docente', 'aula'],
-        ];
+        $plantillas = CsvImportSchemas::ENCABEZADOS;
 
         abort_unless(array_key_exists($tipo, $plantillas), 404);
 
@@ -140,6 +133,8 @@ class CsvController extends Controller
             fputcsv($out, $plantillas[$tipo]);
             fputcsv($out, match ($tipo) {
                 'clave_respuestas' => [1, 20, 'B,C', 'MAT', '', 'Acepta B o C', 1],
+                'alumnos' => ['AEXA000101HMNXXXA1', 2026, 'Ana', 'Ejemplo', 'Sintetica', '2008-01-01', 'EX-001', 8.7],
+                'documentacion' => [2026, 'AEXA000101HMNXXXA1', 'ACTA', 'entregado', ''],
                 'respuestas_examen' => [1, 'EX-001', 'A', 'B', 'C'],
                 'resultados_examen' => [1, 'EX-001', 8, 80, 'BAJO', 'ADECUADO', 4, 80, 'BAJO'],
                 'grupo_escolar' => [2026, 'AEXA000101HMNXXXA1', 'EX-001', '1-A'],

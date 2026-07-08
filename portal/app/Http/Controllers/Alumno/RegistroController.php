@@ -31,7 +31,7 @@ class RegistroController extends Controller
             return back()->withErrors(['curp' => 'Revisa tu CURP: debe tener 18 caracteres y coincidir con el formato oficial.'])->withInput();
         }
 
-        if ($data['folio_examen'] !== $data['folio_examen_confirmacion']) {
+        if (filled($data['folio_examen'] ?? null) && ($data['folio_examen'] !== ($data['folio_examen_confirmacion'] ?? null))) {
             return back()->withErrors(['folio_examen_confirmacion' => 'Los folios no coinciden. Escríbelo igual que aparece en tu hoja de respuestas.'])->withInput();
         }
 

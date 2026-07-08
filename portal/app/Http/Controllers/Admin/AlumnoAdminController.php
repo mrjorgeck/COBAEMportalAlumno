@@ -59,12 +59,15 @@ class AlumnoAdminController extends Controller
             'nombres' => ['required', 'string', 'max:100'],
             'primer_apellido' => ['required', 'string', 'max:100'],
             'segundo_apellido' => ['nullable', 'string', 'max:100'],
-            'folio_examen' => ['required', 'string', 'max:20'],
+            'folio_examen' => ['nullable', 'string', 'max:20'],
             'estatus_proceso' => ['required', 'string', 'max:30'],
         ]);
 
         $proceso->alumno->update(collect($data)->only(['nombres', 'primer_apellido', 'segundo_apellido'])->all());
-        $proceso->update(collect($data)->only(['folio_examen', 'estatus_proceso'])->all());
+        $proceso->update([
+            'folio_examen' => blank($data['folio_examen'] ?? null) ? null : $data['folio_examen'],
+            'estatus_proceso' => $data['estatus_proceso'],
+        ]);
 
         return back()->with('mensaje', 'Alumno actualizado.');
     }

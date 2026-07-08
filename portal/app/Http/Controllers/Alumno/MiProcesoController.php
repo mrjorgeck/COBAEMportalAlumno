@@ -91,6 +91,8 @@ class MiProcesoController extends Controller
     public function marcarAviso(Request $request, Aviso $aviso): RedirectResponse
     {
         $proceso = $this->proceso($request);
+        abort_unless($this->avisoDirigidoAlProceso($aviso, $proceso), 404);
+
         $proceso->alumno->avisosLeidos()->syncWithoutDetaching([
             $aviso->id => ['leido' => true, 'fecha_lectura' => now()],
         ]);
@@ -115,5 +117,19 @@ class MiProcesoController extends Controller
             'regularizacion.ruta',
         ])
             ->findOrFail($request->session()->get('alumno_proceso_id'));
+    }
+
+    private function avisoDirigidoAlProceso(Aviso $aviso, ProcesoIngreso $proceso): bool
+    {
+        if (! $aviso->visible) {
+            return false;
+        }
+
+        return match ($aviso->dirigido_a) {
+            'todos' => true,
+            'ciclo' => (int) $aviso->ciclo_ingreso_id === (int) $proceso->ciclo_ingreso_id,
+            'alumno' => (int) $aviso->alumno_id === (int) $proceso->alumno_id,
+            default => false,
+        };
     }
 }

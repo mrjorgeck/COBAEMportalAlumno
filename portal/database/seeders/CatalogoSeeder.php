@@ -110,9 +110,7 @@ class CatalogoSeeder extends Seeder
             'SICOBAEM' => 'SICOBaEM',
         ]);
 
-        $this->simple('paraescolar', [
-            'DEPORTE' => 'Deportiva', 'CULTURA' => 'Cultural', 'OTRA' => 'Otra',
-        ]);
+        $this->paraescolares();
 
         $this->simple('ocupacion', [
             'EMPLEADO' => 'Empleado(a)', 'COMERCIANTE' => 'Comerciante',
@@ -137,6 +135,43 @@ class CatalogoSeeder extends Seeder
             Catalogo::updateOrCreate(
                 ['tipo' => $tipo, 'clave' => (string) $clave],
                 ['nombre' => $nombre, 'orden' => $orden++],
+            );
+        }
+    }
+
+    private function paraescolares(): void
+    {
+        $valores = [
+            ['CIV_BANDA_GUERRA', 'Banda de guerra', 'Cívicos'],
+            ['CIV_ESCOLTA', 'Escolta', 'Cívicos'],
+            ['CUL_BASTONERAS', 'Bastoneras', 'Cultural'],
+            ['CUL_DANZA', 'Danza', 'Cultural'],
+            ['CUL_BAILE_MODERNO', 'Baile moderno', 'Cultural'],
+            ['CUL_MUSICA', 'Música', 'Cultural'],
+            ['DEP_FUTBOL_VARONIL', 'Fútbol varonil', 'Deportivo'],
+            ['DEP_FUTBOL_FEMENIL', 'Fútbol femenil', 'Deportivo'],
+            ['DEP_VOLEIBOL_VARONIL', 'Voleibol varonil', 'Deportivo'],
+            ['DEP_VOLEIBOL_FEMENIL', 'Voleibol femenil', 'Deportivo'],
+            ['DEP_BASQUETBOL_VARONIL', 'Basquetbol varonil', 'Deportivo'],
+            ['DEP_BASQUETBOL_FEMENIL', 'Basquetbol femenil', 'Deportivo'],
+            ['CLUB_PROTECCION_CIVIL', 'Protección civil', 'Club'],
+            ['CLUB_CICLISMO', 'Ciclismo', 'Club'],
+            ['CLUB_SERVICIO_SOCIAL', 'Servicio social', 'Club'],
+        ];
+
+        Catalogo::where('tipo', 'paraescolar')
+            ->whereNotIn('clave', collect($valores)->pluck(0))
+            ->update(['activo' => false]);
+
+        foreach ($valores as $orden => [$clave, $nombre, $categoria]) {
+            Catalogo::updateOrCreate(
+                ['tipo' => 'paraescolar', 'clave' => $clave],
+                [
+                    'nombre' => $nombre,
+                    'metadata' => ['categoria' => $categoria],
+                    'orden' => $orden,
+                    'activo' => true,
+                ],
             );
         }
     }

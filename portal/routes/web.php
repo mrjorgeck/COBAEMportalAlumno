@@ -101,6 +101,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('sicobaem', [SicobaemConfigController::class, 'store'])->middleware('permission:modulos.publicar')->name('sicobaem.store');
         Route::get('catalogos', [CatalogoController::class, 'index'])->middleware('permission:catalogos.administrar')->name('catalogos.index');
         Route::post('catalogos', [CatalogoController::class, 'store'])->middleware('permission:catalogos.administrar')->name('catalogos.store');
+        Route::patch('catalogos/orden', [CatalogoController::class, 'reordenar'])->middleware('permission:catalogos.administrar')->name('catalogos.reordenar');
+        Route::patch('catalogos/{catalogo}', [CatalogoController::class, 'update'])->middleware('permission:catalogos.administrar')->name('catalogos.update');
+        Route::patch('catalogos/{catalogo}/toggle', [CatalogoController::class, 'toggle'])->middleware('permission:catalogos.administrar')->name('catalogos.toggle');
         Route::post('ciclos', [CicloController::class, 'store'])->middleware('permission:usuarios.administrar')->name('ciclos.store');
         Route::get('modulos', [ModuloController::class, 'index'])->middleware('permission:modulos.publicar')->name('modulos.index');
         Route::post('modulos', [ModuloController::class, 'store'])->middleware('permission:modulos.publicar')->name('modulos.store');

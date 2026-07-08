@@ -55,7 +55,7 @@ class RegistroWizard extends Component
             return null;
         }
 
-        if ($data['folio_examen'] !== $data['folio_examen_confirmacion']) {
+        if (filled($data['folio_examen'] ?? null) && ($data['folio_examen'] !== ($data['folio_examen_confirmacion'] ?? null))) {
             $this->addError('form.folio_examen_confirmacion', 'Los folios no coinciden. Escríbelo igual que aparece en tu hoja de respuestas.');
 
             return null;

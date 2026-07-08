@@ -56,6 +56,32 @@ class Fase1AcceptanceTest extends TestCase
             ->assertRedirect(route('alumno.mi-proceso'));
     }
 
+    public function test_alumno_puede_registrarse_sin_folio_de_examen(): void
+    {
+        $payload = $this->payloadRegistro();
+        $payload['folio_examen'] = null;
+        $payload['folio_examen_confirmacion'] = null;
+
+        $this->post(route('alumno.registro.store'), $payload)
+            ->assertRedirect(route('alumno.registro.exito'));
+
+        $proceso = ProcesoIngreso::with('alumno')->first();
+
+        $this->assertSame('XAXX080202HMCXXXA0', $proceso->alumno->curp);
+        $this->assertNull($proceso->folio_examen);
+        $this->assertSame('NI-2026-ARIO-0001', $proceso->folio_registro);
+    }
+
+    public function test_folio_de_examen_opcional_debe_coincidir_si_se_captura(): void
+    {
+        $payload = $this->payloadRegistro();
+        $payload['folio_examen'] = 'FE-001';
+        $payload['folio_examen_confirmacion'] = 'FE-002';
+
+        $this->post(route('alumno.registro.store'), $payload)
+            ->assertSessionHasErrors('folio_examen_confirmacion');
+    }
+
     public function test_criterios_5_6_control_escolar_busca_y_exporta_csv(): void
     {
         $proceso = $this->crearProcesoRegistrado();
@@ -75,7 +101,7 @@ class Fase1AcceptanceTest extends TestCase
         Queue::fake();
         $this->actingAs($this->admin());
 
-        $file = UploadedFile::fake()->createWithContent('alumnos.csv', "curp,ciclo,nombres,primer_apellido,fecha_nacimiento,folio_examen,promedio_secundaria\nXAXX080202HMCXXXA0,2026,Ana,Prueba,2008-02-02,FE-777,8.7\n");
+        $file = UploadedFile::fake()->createWithContent('alumnos.csv', "curp,ciclo,nombres,primer_apellido,segundo_apellido,fecha_nacimiento,folio_examen,promedio_secundaria\nXAXX080202HMCXXXA0,2026,Ana,Prueba,Sintetica,2008-02-02,FE-777,8.7\n");
 
         $this->post(route('admin.importaciones.store'), ['tipo_importacion' => 'alumnos', 'archivo' => $file])
             ->assertRedirect();
