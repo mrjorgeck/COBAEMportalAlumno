@@ -60,8 +60,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('login.store');
     });
 
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', 'password.inicial'])->group(function () {
         Route::post('logout', [AuthController::class, 'destroy'])->name('logout');
+        Route::get('password/cambiar', [AuthController::class, 'editPassword'])->name('password.edit');
+        Route::post('password/cambiar', [AuthController::class, 'updatePassword'])->name('password.update');
 
         Route::get('/', DashboardController::class)
             ->middleware('permission:dashboard.registros')

@@ -103,7 +103,7 @@ proceso_ingreso_id FK, tipo_documento_id FK catalogos, estado_documento VARCHAR(
 ciclo_ingreso_id FK, nombre, tipo ENUM(diagnostico_inicial, evaluacion_posterior), fecha_aplicacion, version, total_preguntas SMALLINT, plantilla_omr_id NULL (FK plantillas_omr), activo.
 
 ### claves_respuesta
-examen_id FK, pregunta SMALLINT, respuesta_correcta CHAR(1), area_id FK catalogos, materia_id FK catalogos NULL, competencia VARCHAR(150) NULL, ponderacion DECIMAL(5,2) default 1. UNIQUE(examen_id, pregunta).
+examen_id FK, pregunta SMALLINT, respuesta_correcta VARCHAR(20), area_id FK catalogos, materia_id FK catalogos NULL, competencia VARCHAR(150) NULL, ponderacion DECIMAL(5,2) default 1. UNIQUE(examen_id, pregunta). `respuesta_correcta` guarda una o varias opciones validas normalizadas con coma, por ejemplo `A` o `B,C`.
 
 ### plantillas_omr
 id, nombre, examen_tipo, definicion_json JSON (zonas de respuesta, nº preguntas, opciones, zona de folio), activo. Se replica al servicio OMR.
@@ -167,7 +167,7 @@ proceso_ingreso_id FK, ruta_regularizacion_id NULL, plataforma_externa_url NULL,
 Reglas: nunca borrar físicamente (CAT-02); inactivar. FKs de negocio apuntan a `catalogos.id` conservando histórico (RNF-23).
 
 ### users (personal)
-Laravel estándar + name, email UNIQUE, password, activo. Roles vía spatie: `admin`, `control_escolar`, `coordinacion`, `direccion`, `docente`, `tecnico`.
+Laravel estándar + name, email UNIQUE, password, activo, debe_cambiar_password. Roles vía spatie: `admin`, `control_escolar`, `coordinacion`, `direccion`, `docente`, `tecnico`.
 
 ### importaciones_csv
 tipo_importacion VARCHAR(50), archivo_original_path, usuario_id FK, total_filas, registros_creados, registros_actualizados, registros_sin_cambios, registros_error, resumen JSON (errores fila a fila), estado ENUM(pendiente, procesando, completada, error), timestamps.

@@ -25,6 +25,7 @@ class AdminUserSeeder extends Seeder
                 'name' => 'Administrador del Portal',
                 'password' => $password,
                 'activo' => true,
+                'debe_cambiar_password' => true,
             ],
         );
 
