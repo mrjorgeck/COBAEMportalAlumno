@@ -5,6 +5,7 @@
 ## 1. CSV — principios generales
 
 - Librería: `league/csv`. Codificación UTF-8 con BOM (compatibilidad Excel). Separador `,` (auto-detección de `;`).
+- Las exportaciones neutralizan inyección de fórmulas: cualquier celda de texto libre que, tras espacios iniciales, comience con `=`, `+`, `-` o `@` se prefija de forma segura antes de enviarse a Excel/CSV.
 - Toda importación corre como **job encolado** con procesamiento por lotes (chunks de 100 filas) y genera registro en `importaciones_csv` con reporte fila a fila (RNF-29).
 - Plantillas CSV descargables desde el panel para cada tipo de importación (encabezados exactos + fila de ejemplo).
 - Llave de actualización: **CURP + ciclo de ingreso** (reglas §23.3 del requerimiento, implementadas en `Services/Csv/`).
@@ -17,7 +18,7 @@
 | `documentacion` | CURP/folio + ciclo + tipo_documento | Actualiza estados de documentos |
 | `resultados_examen` | folio_examen + examen | Resultados calculados externamente (puntaje/porcentaje por área) |
 | `respuestas_examen` | folio_examen + examen | Respuestas crudas (fallback del OMR); dispara cálculo |
-| `clave_respuestas` | examen + pregunta | Clave, área, materia, ponderación |
+| `clave_respuestas` | examen + pregunta | Clave, respuestas válidas, área, materia, ponderación |
 | `grupo_propedeutico` | CURP/folio + ciclo | Asignación de grupo |
 | `grupo_escolar` | CURP/folio + ciclo | Asignación de grupo escolar |
 | `matriculas` | CURP/folio + ciclo | Carga de matrícula (valida unicidad) |
@@ -30,7 +31,7 @@ Flujo de importación: subir archivo → validación de estructura (encabezados,
 
 Pendiente de confirmacion del formato federal real (docs/09 seccion 6.4), Fase 2 usa estas columnas:
 
-- `clave_respuestas`: `examen_id,pregunta,respuesta_correcta,area_clave,materia_clave,competencia,ponderacion`.
+- `clave_respuestas`: `examen_id,pregunta,respuesta_correcta,area_clave,materia_clave,competencia,ponderacion`. `respuesta_correcta` acepta una opción (`A`) o varias opciones válidas separadas por coma, diagonal o sin separador (`B,C`, `B/C`, `BC`); se normaliza a coma.
 - `respuestas_examen`: `examen_id,folio_examen,1,2,3...N`, donde cada columna numerica representa la respuesta del alumno a esa pregunta.
 - `resultados_examen`: `examen_id,folio_examen,puntaje_total,porcentaje_total,nivel_riesgo_clave,nivel_desempeno_clave` y, por cada area de catalogo, columnas opcionales `{AREA}_puntaje,{AREA}_porcentaje,{AREA}_riesgo,{AREA}_recomendacion`.
 - `grupo_propedeutico`: `ciclo,curp,folio_examen,grupo`.

@@ -23,10 +23,11 @@ class CsvController extends Controller
 
         return response()->streamDownload(function (): void {
             $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, ['curp', 'nombre', 'folio_registro', 'folio_examen', 'ciclo', 'estatus', 'documentacion']);
             ProcesoIngreso::with(['alumno', 'ciclo'])->chunk(100, function ($procesos) use ($out): void {
                 foreach ($procesos as $proceso) {
-                    fputcsv($out, [
+                    $this->putCsvRow($out, [
                         $proceso->alumno->curp,
                         $proceso->alumno->nombre_completo,
                         $proceso->folio_registro,
@@ -47,11 +48,12 @@ class CsvController extends Controller
 
         return response()->streamDownload(function (): void {
             $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, ['curp', 'folio_registro', 'ciclo', 'documento', 'estado', 'observacion']);
             ProcesoIngreso::with(['alumno', 'ciclo', 'documentos.tipoDocumento'])->chunk(100, function ($procesos) use ($out): void {
                 foreach ($procesos as $proceso) {
                     foreach ($proceso->documentos as $documento) {
-                        fputcsv($out, [
+                        $this->putCsvRow($out, [
                             $proceso->alumno->curp,
                             $proceso->folio_registro,
                             $proceso->ciclo->anio,
@@ -72,11 +74,12 @@ class CsvController extends Controller
 
         return response()->streamDownload(function (): void {
             $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, ['curp', 'folio_examen', 'ciclo', 'examen', 'puntaje_total', 'porcentaje_total', 'nivel_riesgo', 'nivel_desempeno']);
             ProcesoIngreso::with(['alumno', 'ciclo', 'resultados.examen', 'resultados.nivelRiesgo', 'resultados.nivelDesempeno'])->chunk(100, function ($procesos) use ($out): void {
                 foreach ($procesos as $proceso) {
                     foreach ($proceso->resultados as $resultado) {
-                        fputcsv($out, [
+                        $this->putCsvRow($out, [
                             $proceso->alumno->curp,
                             $proceso->folio_examen,
                             $proceso->ciclo->anio,
@@ -136,7 +139,7 @@ class CsvController extends Controller
             $out = fopen('php://output', 'w');
             fputcsv($out, $plantillas[$tipo]);
             fputcsv($out, match ($tipo) {
-                'clave_respuestas' => [1, 1, 'A', 'MAT', '', 'Operaciones basicas', 1],
+                'clave_respuestas' => [1, 20, 'B,C', 'MAT', '', 'Acepta B o C', 1],
                 'respuestas_examen' => [1, 'EX-001', 'A', 'B', 'C'],
                 'resultados_examen' => [1, 'EX-001', 8, 80, 'BAJO', 'ADECUADO', 4, 80, 'BAJO'],
                 'grupo_escolar' => [2026, 'AEXA000101HMNXXXA1', 'EX-001', '1-A'],
@@ -146,5 +149,28 @@ class CsvController extends Controller
             });
             fclose($out);
         }, $tipo.'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /**
+     * @param  resource  $out
+     */
+    private function putCsvRow($out, array $row): void
+    {
+        fputcsv($out, array_map($this->neutralizeFormula(...), $row));
+    }
+
+    private function neutralizeFormula(mixed $value): mixed
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $trimmed = ltrim($value);
+
+        if ($trimmed !== '' && str_contains('=+-@', $trimmed[0])) {
+            return "'".$value;
+        }
+
+        return $value;
     }
 }
