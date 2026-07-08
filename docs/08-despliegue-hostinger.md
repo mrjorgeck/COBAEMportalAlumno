@@ -55,9 +55,13 @@ DB_USERNAME=<usuario del panel>
 DB_PASSWORD=<contraseña del panel>
 
 SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+SESSION_HTTP_ONLY=true
+SESSION_SAME_SITE=lax
 QUEUE_CONNECTION=database
 CACHE_STORE=database
 FILESYSTEM_DISK=local
+PORTAL_AVISO_PRIVACIDAD_FECHA_PUBLICACION="fecha oficial fijada por el plantel"
 
 OMR_SERVICE_URL=https://<host-servicio-omr>
 OMR_SERVICE_KEY=<api key>
@@ -69,7 +73,7 @@ MAIL_MAILER=smtp   # SMTP de Hostinger si se usa correo
 ```
 * * * * * cd /home/u132762550/apps/portal/portal && php artisan schedule:run >> /dev/null 2>&1
 ```
-El scheduler ejecuta: `queue:work --stop-when-empty --max-time=50` cada minuto (jobs de CSV/OMR), backups diarios, limpieza de sesiones. Sin workers persistentes (limitación del plan compartido).
+El scheduler ejecuta: `queue:work --stop-when-empty --max-time=50` cada minuto (jobs de CSV/OMR), `db:backup-predeploy --daily` a las 02:15, limpieza de sesiones. Sin workers persistentes (limitación del plan compartido).
 
 ## 2. Despliegue (cada release) — `deploy/deploy.sh`
 
@@ -103,7 +107,9 @@ php artisan up
 EOF
 ```
 
-Verificar versión de PHP CLI en servidor (`php -v`); si el CLI default no es 8.3 usar la ruta explícita (ej. `/usr/bin/php8.3` o el alias que indique Hostinger).
+Verificar versión de PHP CLI en servidor (`php -v`); si el CLI default no es 8.3 usar la ruta explícita (ej. `/usr/bin/php8.3` o el alias que indique Hostinger). El script falla si `APP_ENV` no es `production` o si `APP_DEBUG` no es `false`.
+
+Antes de migrar, `deploy/deploy.sh` ejecuta `php artisan db:backup-predeploy`. El comando genera un dump MariaDB en `~/backups` con `mysqldump`, usa `DB_BACKUP_RETENTION=14` por defecto y respeta `DB_BACKUP_PATH`/`MYSQLDUMP_BIN` si Hostinger requiere rutas específicas.
 
 El script `deploy/deploy.sh` toma esta llave por defecto. Si necesitas usar otra, ejecuta:
 
@@ -140,7 +146,7 @@ Flujo git: feature branch → PR → main → `deploy.sh`. Etiquetar releases (`
 
 1. `php artisan down`
 2. `git checkout <tag anterior>` + `composer install --no-dev`
-3. Si hubo migración incompatible: restaurar dump de BD del backup previo al deploy (el script puede hacer `mysqldump` automático antes de migrar — recomendado activarlo).
+3. Si hubo migración incompatible: restaurar dump de BD del backup previo al deploy generado por `php artisan db:backup-predeploy`.
 4. `php artisan config:cache && php artisan up`
 
 ## 6. Monitoreo mínimo

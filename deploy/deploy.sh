@@ -45,17 +45,17 @@ cd "${ROOT_DIR}/portal"
 npm ci
 npm run build
 
-echo "==> 2/4 Subiendo assets compilados"
+echo "==> 2/5 Subiendo assets compilados"
 rsync -avz --delete -e "${RSYNC_SSH}" \
     public/build/ "${SSH_USER}@${SSH_HOST}:${APP_DIR}/public/build/"
 
-echo "==> 3/4 Respaldo de BD previo al deploy"
-"${SSH[@]}" "cd ${APP_DIR} && ${PHP_BIN} artisan db:backup-predeploy || \
-      mysqldump --defaults-extra-file=~/.my.cnf u132762550_COBAEM \
-      > ~/backups/predeploy-\$(date +%Y%m%d-%H%M%S).sql || \
-      echo 'AVISO: respaldo manual no disponible; continuar bajo tu propio riesgo'"
+echo "==> 3/5 Verificando entorno de produccion"
+"${SSH[@]}" "cd ${APP_DIR} && test \"\$(${PHP_BIN} artisan tinker --execute='echo app()->environment();')\" = production && test \"\$(${PHP_BIN} artisan tinker --execute='echo config(\"app.debug\") ? \"true\" : \"false\";')\" = false"
 
-echo "==> 4/4 Actualizando aplicación en el servidor"
+echo "==> 4/5 Respaldo de BD previo al deploy"
+"${SSH[@]}" "cd ${APP_DIR} && ${PHP_BIN} artisan db:backup-predeploy"
+
+echo "==> 5/5 Actualizando aplicación en el servidor"
 "${SSH[@]}" bash -s <<EOF
 set -euo pipefail
 cd ${REPO_DIR}
