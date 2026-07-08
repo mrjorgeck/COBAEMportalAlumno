@@ -24,8 +24,8 @@ npm install
 ```
 
 **Nota sobre la versión de Laravel**: `composer.json` acepta `^12.0|^13.0` con
-plataforma fijada a PHP 8.3. Composer instalará Laravel 13.2.x (la última
-compatible con 8.3; las 13.3+ requieren PHP 8.4) o Laravel 12 si algún paquete
+plataforma fijada a PHP 8.3. Composer instalará Laravel 12.x, la versión real
+de producción para este portal en Hostinger compartido. Si algún paquete
 aún no soporta 13. Ambas funcionan con esta estructura.
 
 ## 2. Publicar migraciones de paquetes

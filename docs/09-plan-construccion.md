@@ -21,7 +21,7 @@ Alineado a la priorización §32 del requerimiento. Estimaciones en tallas (S �
 ### Fase 0 — Cimientos
 | # | Tarea | Talla |
 |---|---|---|
-| 0.1 | Crear proyecto Laravel (composer acepta `^12\|^13` con plataforma PHP 8.3: Laravel 13.3+ requiere 8.4), auth propia mínima, Livewire, Tailwind, spatie/permission, activitylog, dompdf, league/csv | M |
+| 0.1 | Crear proyecto Laravel 12.x real con plataforma PHP 8.3, auth propia mínima, Livewire, Tailwind, spatie/permission, activitylog, dompdf, league/csv | M |
 | 0.2 | Configurar subdominio, SSL, SSH con llave, BD, cron en Hostinger | S |
 | 0.3 | Script `deploy.sh` + primer despliegue "hola mundo" en producción | S |
 | 0.4 | Migraciones núcleo: catalogos, ciclos, planteles, users/roles + seeders (entidades, municipios Michoacán, catálogos base, plantel ARIO, ciclo 2026, admin) | M |
@@ -90,7 +90,7 @@ Los 20 puntos de §31 del requerimiento son el contrato de aceptación de las Fa
 
 | Riesgo | Mitigación |
 |---|---|
-| Laravel 13 incompatible con PHP 8.3 de Hostinger | Verificar en tarea 0.1; usar Laravel 12.x sin cambio de diseño |
+| Cambios futuros de Laravel incompatibles con PHP 8.3 de Hostinger | Mantener Laravel 12.x mientras producción siga en PHP 8.3 |
 | Límites de CPU/memoria en compartido durante importaciones | Jobs por lotes de 100 filas; `max-time` en queue:work |
 | Symlink de subdominio no permitido | Alternativas documentadas en 08-despliegue §1.3 |
 | Pico de registro simultáneo al terminar el examen (~300 alumnos en 1-2 h) | Prueba de carga previa; páginas ligeras; sesión en BD; considerar escalonar por grupos |

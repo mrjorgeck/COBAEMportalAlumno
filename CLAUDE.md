@@ -8,7 +8,7 @@ Portal Académico de Nuevo Ingreso, COBAEM Plantel Ario de Rosales. Registro dig
 
 ## Stack y restricciones duras
 
-- Laravel (PHP 8.3) + MariaDB + Blade/Livewire 3/Tailwind. **No introducir** SPA, Redis, workers persistentes, ni binarios: producción es **Hostinger compartido** (colas driver `database` vía cron, ver `docs/08`).
+- Laravel 12.x real (PHP 8.3) + MariaDB + Blade/Livewire 3/Tailwind. **No introducir** SPA, Redis, workers persistentes, ni binarios: producción es **Hostinger compartido** (colas driver `database` vía cron, ver `docs/08`).
 - OMR es un **servicio externo** (FastAPI/OpenCV, `omr-service/`); el portal solo lo consume por HTTP (`OmrClient`). El portal debe funcionar sin él (fallback CSV).
 - Assets se compilan localmente (`npm run build`); el servidor no compila.
 
@@ -67,4 +67,4 @@ Feature tests obligatorios para: registro completo del alumno, acceso/verificaci
 
 ## Estado actual
 
-**EN PRODUCCIÓN**: https://registrocobaemario.ariocentro.com (desplegado desde `main` con `deploy/deploy.sh`; llave SSH local en `cert/`, ignorada por git). MVP completo y verificado: Fases 0–3 (20 criterios §31, 46+ tests) + fase UX (commits UX.0–UX.8: campos obligatorios derivados de reglas con componentes `x-campo`, mensajes y validación en español vía laravel-lang, páginas de error 403–503 amigables, wizard con progreso/loading/scroll-a-error, entradas móviles optimizadas, selects buscables con Alpine, toasts y confirmaciones; deuda del permiso de ciclos corregida en UX.0). Convenciones UX documentadas en `docs/03`. PHP 8.3.32 local en Windows (ver `portal/SETUP.md`). Siguientes pasos: (1) UAT con control escolar en producción + recorrido móvil real 360px; (2) Fase 4 piloto OMR (`docs/09` §2, diseño `docs/05`) — requiere decidir hosting del servicio. Antes de operar con alumnos reales: cambiar contraseña del admin del seeder, verificar cron/backups en Hostinger, y resolver los BLOQUEADORES del plantel (`docs/09` §6): aviso de privacidad y formato PDF oficial.
+**EN PRODUCCIÓN**: https://registrocobaemario.ariocentro.com (desplegado desde `main` con `deploy/deploy.sh`; llave SSH local en `cert/`, ignorada por git). MVP completo y verificado: Fases 0–3 (20 criterios §31, 46+ tests) + fase UX (commits UX.0–UX.8). Endurecimiento 1 agrega aviso de privacidad oficial, HTTPS/HSTS en producción, escape CSV, rotación obligatoria del admin inicial y respaldos MariaDB por Artisan/cron. Convenciones UX documentadas en `docs/03`. PHP 8.3.32 local en Windows (ver `portal/SETUP.md`). Siguientes pasos: UAT con control escolar en producción y Fase 4 piloto OMR (`docs/09` §2, diseño `docs/05`).

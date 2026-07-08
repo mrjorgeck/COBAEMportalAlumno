@@ -37,7 +37,7 @@ Monolito modular en Laravel, con un microservicio OMR externo. Dos frentes de us
 
 | Capa | Tecnología | Justificación |
 |---|---|---|
-| Backend | Laravel 13.x (verificar compatibilidad, ver §7) | Convenciones claras, ecosistema maduro, mantenible por personal limitado |
+| Backend | Laravel 12.x (real, PHP 8.3) | Convenciones claras, ecosistema maduro, mantenible por personal limitado |
 | Lenguaje | PHP 8.3 | Disponible en Hostinger; requerido por el proyecto |
 | BD | MariaDB (utf8mb4) | Disponible en Hostinger; prod: `u132762550_COBAEM` |
 | Frontend | Blade + Livewire 3 + Alpine.js + Tailwind CSS | Sin SPA ni API pública para el alumno; formularios reactivos (catálogos dependientes) sin build complejo; mobile-first |
@@ -148,7 +148,7 @@ PortalNuevosIngresos/
 
 ## 7. Notas de verificación (revisor de calidad)
 
-- **Versión de Laravel**: el requerimiento dice Laravel 13. Verificar al iniciar que Laravel 13 sea estable y compatible con PHP 8.3 en Hostinger; si Laravel 13 exigiera PHP ≥ 8.4 y el plan solo ofrece 8.3, usar Laravel 12.x (misma arquitectura, sin cambios de diseño).
+- **Versión de Laravel**: se usa Laravel 12.x real con PHP 8.3 en Hostinger compartido. La arquitectura no depende de Laravel 13.
 - **HTTPS**: el subdominio se referenció como `http://`; debe operar exclusivamente en `https://registrocobaemario.ariocentro.com` (SSL gratuito de Hostinger + redirección forzada). El certificado SSL del sitio y la llave SSH de despliegue son cosas distintas; ambas se configuran (ver `08-despliegue-hostinger.md`).
 - **Credenciales**: solo en `.env` del servidor (BD `u132762550_COBAEM`, usuario/contraseña). Nunca en el repositorio.
 - **Límite de recursos**: importaciones y OMR siempre por jobs encolados con lotes pequeños para respetar límites de CPU/memoria del plan compartido.
