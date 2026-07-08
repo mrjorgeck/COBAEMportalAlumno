@@ -20,7 +20,7 @@
         <div class="flex items-center justify-between">
             <span>Paso {{ $step }} de 6</span>
             <span class="font-semibold text-cobaem-900">
-                {{ ['CURP y folio', 'Datos personales', 'Contacto', 'Escuela', 'Familia', 'Privacidad'][$step - 1] }}
+                {{ ['CURP y folio', 'Datos personales', 'Domicilio y contacto', 'Escuela', 'Familia', 'Privacidad'][$step - 1] }}
             </span>
         </div>
         <div class="mt-3 h-2 rounded bg-gray-100">
@@ -106,17 +106,17 @@
         </section>
     @elseif ($step === 3)
         <section wire:key="registro-step-3" class="space-y-4 rounded bg-white p-4 shadow-sm">
-            <x-campo for="{{ $id('municipio_id') }}" label="Municipio" :required="$isRequired('municipio_id')">
-                <x-select-buscable label="Buscar municipio" placeholder="Buscar municipio">
+            <x-campo for="{{ $id('municipio_id') }}" label="Municipio de domicilio" :required="$isRequired('municipio_id')">
+                <x-select-buscable label="Filtrar municipios" placeholder="Escribe para filtrar municipios">
                     <select id="{{ $id('municipio_id') }}" wire:key="registro-municipio" name="municipio_id" wire:model="form.municipio_id" aria-required="{{ $isRequired('municipio_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['municipio'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
                 </x-select-buscable>
             </x-campo>
-            <x-campo for="{{ $id('localidad_id') }}" label="Localidad" :required="$isRequired('localidad_id')">
-                <x-select-buscable label="Buscar localidad" placeholder="Buscar localidad">
+            <x-campo for="{{ $id('localidad_id') }}" label="Localidad de domicilio" :required="$isRequired('localidad_id')">
+                <x-select-buscable label="Filtrar localidades" placeholder="Escribe para filtrar localidades">
                     <select id="{{ $id('localidad_id') }}" wire:key="registro-localidad" name="localidad_id" wire:model="form.localidad_id" aria-required="{{ $isRequired('localidad_id') ? 'true' : 'false' }}" required class="{{ $select }}"><option value="">Selecciona</option>@foreach ($catalogos['localidad'] as $item)<option value="{{ $item->id }}">{{ $item->nombre }}</option>@endforeach</select>
                 </x-select-buscable>
             </x-campo>
-            <x-campo for="{{ $id('domicilio') }}" label="Domicilio" :required="$isRequired('domicilio')">
+            <x-campo for="{{ $id('domicilio') }}" label="Domicilio, calle y numero" :required="$isRequired('domicilio')">
                 <input id="{{ $id('domicilio') }}" wire:key="registro-domicilio" name="domicilio" autocomplete="section-alumno street-address" wire:model="form.domicilio" aria-required="{{ $isRequired('domicilio') ? 'true' : 'false' }}" required class="{{ $input }}">
             </x-campo>
             <x-campo for="{{ $id('colonia') }}" label="Colonia" :required="$isRequired('colonia')">
@@ -208,7 +208,16 @@
             </x-campo>
             <label class="mt-4 flex min-h-11 items-start gap-2 text-sm">
                 <input id="{{ $id('acepto_privacidad') }}" wire:key="registro-acepto-privacidad" type="checkbox" name="acepto_privacidad" wire:model="form.acepto_privacidad" value="1" required aria-required="true" class="mt-1">
-                <span>Acepto el aviso de privacidad <x-obligatorio :required="$isRequired('acepto_privacidad')" /></span>
+                <span>
+                    Acepto el aviso de privacidad <x-obligatorio :required="$isRequired('acepto_privacidad')" />
+                    <span class="mt-2 block text-gray-700">
+                        El Colegio de Bachilleres del Estado de Michoacan, con la participacion operativa del Plantel Ario de Rosales, utilizara los datos personales proporcionados en el Portal Academico de Nuevo Ingreso para registro digital de aspirantes, generacion del formato de inscripcion en PDF, seguimiento de documentacion, consulta de resultados de evaluacion diagnostica, curso propedeutico, publicacion de grupo, matricula, horario, avisos institucionales, soporte, seguridad informatica, reportes internos y cumplimiento de obligaciones legales.
+                    </span>
+                    <span class="mt-2 block text-gray-700">
+                        Antes de continuar, consulte el
+                        <a href="{{ route('alumno.privacidad') }}" target="_blank" rel="noopener" class="font-semibold text-cobaem-900 underline">Aviso de Privacidad Integral</a>.
+                    </span>
+                </span>
             </label>
         </section>
     @endif

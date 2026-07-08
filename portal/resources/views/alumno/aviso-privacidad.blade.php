@@ -3,13 +3,17 @@
 @section('titulo', 'Aviso de privacidad')
 
 @section('contenido')
-    <div class="rounded-xl bg-white p-6 shadow">
-        <h1 class="text-xl font-bold text-cobaem-900">Aviso de privacidad</h1>
+    @php
+        $fuente = file_get_contents(base_path('../docs/aviso-privacidad.md')) ?: '';
+        preg_match('/## Versi.n integral\s*(.*?)\n---\s*\n## Versi.n simplificada/su', $fuente, $matches);
+        $aviso = trim($matches[1] ?? '');
+        $aviso = str_replace('[colocar fecha de publicacion]', config('portal.aviso_privacidad_fecha_publicacion'), $aviso);
+        $aviso = str_replace('[colocar fecha de publicación]', config('portal.aviso_privacidad_fecha_publicacion'), $aviso);
+    @endphp
 
-        {{-- PENDIENTE (docs/09 §6.2): texto legal definitivo proporcionado
-             por el plantel/COBAEM. NO publicar el portal sin este texto. --}}
-        <p class="mt-4 text-sm text-gray-600">
-            [Pendiente: aviso de privacidad institucional proporcionado por el plantel.]
-        </p>
-    </div>
+    <section class="rounded bg-white p-6 shadow-sm">
+        <div class="prose prose-sm max-w-none whitespace-pre-line text-gray-800">
+            {{ $aviso }}
+        </div>
+    </section>
 @endsection

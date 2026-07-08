@@ -27,6 +27,9 @@ return [
     // Sesión del alumno (minutos de inactividad).
     'sesion_alumno_minutos' => 30,
 
+    // El plantel fija la fecha oficial en PORTAL_AVISO_PRIVACIDAD_FECHA_PUBLICACION.
+    'aviso_privacidad_fecha_publicacion' => env('PORTAL_AVISO_PRIVACIDAD_FECHA_PUBLICACION', '[colocar fecha de publicacion]'),
+
     // Versión de plantilla PDF que se asigna a procesos nuevos (ADR-07).
     'pdf_plantilla_actual' => 'v2026',
 
